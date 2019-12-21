@@ -40,6 +40,11 @@ impl Tuple {
             && nearly_equal(self.w, other.w)
     }
 
+    // Return dot product.
+    pub fn dot(&self, other: &Tuple) -> f64 {
+        (self.x * other.x) + (self.y * other.y) + (self.z * other.z) + (self.w * other.w)
+    }
+
     pub fn magnitude(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
@@ -261,6 +266,17 @@ mod tests {
         assert_eq!(
             Tuple::new_vector(1.0, 2.0, 3.0).normalize().magnitude(),
             1.0
+        );
+    }
+
+    #[test]
+    fn dot_product() {
+        assert_eq!(
+            Tuple::dot(
+                &Tuple::new_vector(1.0, 2.0, 3.0),
+                &Tuple::new_vector(2.0, 3.0, 4.0)
+            ),
+            20.0
         );
     }
 }
