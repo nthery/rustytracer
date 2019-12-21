@@ -4,6 +4,6 @@
 //! TODO: Really need to overload operators for T and &T?
 
 // TODO: public or crate internal?
+pub mod canvas;
 pub mod color;
 pub mod tuple;
-pub mod canvas;

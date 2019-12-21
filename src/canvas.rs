@@ -4,6 +4,7 @@
 
 use crate::color::Color;
 
+/// A 2D grid of pixels.
 pub struct Canvas {
     width: usize,
     height: usize,
@@ -11,6 +12,7 @@ pub struct Canvas {
 }
 
 impl Canvas {
+    /// Create a black canvas of the specified size.
     pub fn new(width: usize, height: usize) -> Canvas {
         Canvas {
             width,
@@ -31,6 +33,12 @@ impl Canvas {
         assert!(y < self.height);
         &self.pixels[y * self.width + x]
     }
+
+    pub fn set(&mut self, x: usize, y: usize, color: &Color) {
+        assert!(x < self.width);
+        assert!(y < self.height);
+        self.pixels[y * self.width + x] = color.clone();
+    }
 }
 
 #[cfg(test)]
@@ -46,5 +54,12 @@ mod tests {
         // All pixels are black
         assert_eq!(*c.get(0, 0), Color::new(0.0, 0.0, 0.0));
         assert_eq!(*c.get(9, 19), Color::new(0.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn writing_pixel() {
+        let mut c = Canvas::new(10, 20);
+        c.set(1, 2, &Color::new(1.0, 0.0, 0.0));
+        assert_eq!(*c.get(1, 2), Color::new(1.0, 0.0, 0.0));
     }
 }
