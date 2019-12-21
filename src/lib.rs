@@ -54,6 +54,13 @@ impl std::ops::Add for &Tuple {
     }
 }
 
+impl std::ops::Sub for &Tuple {
+    type Output = Tuple;
+    fn sub(self, o: Self) -> Tuple {
+        Tuple::new(self.x - o.x, self.y - o.y, self.z - o.z, self.w - o.w)
+    }
+}
+
 // Stolen from https://users.rust-lang.org/t/assert-eq-for-float-numbers/7034/4
 fn nearly_equal(a: f64, b: f64) -> bool {
     let abs_a = a.abs();
@@ -138,5 +145,29 @@ mod tests {
         let r = Tuple::new(-2.0, 3.0, 1.0, 0.0);
         let sum = &l + &r;
         assert_eq!(sum, Tuple::new(1.0, 1.0, 6.0, 1.0));
+    }
+
+    #[test]
+    fn subtracting_two_points_gives_a_vector() {
+        let l = Tuple::new_point(3.0, 2.0, 1.0);
+        let r = Tuple::new_point(5.0, 6.0, 7.0);
+        let diff = &l - &r;
+        assert_eq!(diff, Tuple::new_vector(-2.0, -4.0, -6.0));
+    }
+
+    #[test]
+    fn subtracting_a_vector_from_a_point_gives_a_point() {
+        let l = Tuple::new_point(3.0, 2.0, 1.0);
+        let r = Tuple::new_vector(5.0, 6.0, 7.0);
+        let diff = &l - &r;
+        assert_eq!(diff, Tuple::new_point(-2.0, -4.0, -6.0));
+    }
+
+    #[test]
+    fn subtracting_two_vectors_gives_a_vector() {
+        let l = Tuple::new_vector(3.0, 2.0, 1.0);
+        let r = Tuple::new_vector(5.0, 6.0, 7.0);
+        let diff = &l - &r;
+        assert_eq!(diff, Tuple::new_vector(-2.0, -4.0, -6.0));
     }
 }
