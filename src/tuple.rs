@@ -1,6 +1,9 @@
-/// Tuples, points and vectors.
-///
-/// TRTC chapter 1.
+//! Tuples, points and vectors.
+//!
+//! TRTC chapter 1.
+//!
+//! TODO: Implement Tuple as array (like Color)?
+
 use std::f64;
 
 /// A quadruplet that can represent a 3D point (w == 1.0) or vector (w == 0.0).
