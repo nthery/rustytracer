@@ -41,6 +41,19 @@ impl Tuple {
     }
 }
 
+impl PartialEq for Tuple {
+    fn eq(&self, o: &Tuple) -> bool {
+        self.x == o.x && self.y == o.y && self.z == o.z && self.w == o.w
+    }
+}
+
+impl std::ops::Add for &Tuple {
+    type Output = Tuple;
+    fn add(self, o: Self) -> Tuple {
+        Tuple::new(self.x + o.x, self.y + o.y, self.z + o.z, self.w + o.w)
+    }
+}
+
 // Stolen from https://users.rust-lang.org/t/assert-eq-for-float-numbers/7034/4
 fn nearly_equal(a: f64, b: f64) -> bool {
     let abs_a = a.abs();
@@ -117,5 +130,13 @@ mod tests {
         let l = Tuple::new_point(1.1, 2.2, 3.3);
         let r = Tuple::new_point(1.1, 2.2 - f64::EPSILON, 3.3);
         assert!(l.nearly_equal(&r));
+    }
+
+    #[test]
+    fn add_tuples() {
+        let l = Tuple::new(3.0, -2.0, 5.0, 1.0);
+        let r = Tuple::new(-2.0, 3.0, 1.0, 0.0);
+        let sum = &l + &r;
+        assert_eq!(sum, Tuple::new(1.0, 1.0, 6.0, 1.0));
     }
 }
