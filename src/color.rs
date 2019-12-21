@@ -99,6 +99,22 @@ impl std::ops::Mul for Color {
     }
 }
 
+pub const BLACK: Color = Color {
+    rgb: [0.0, 0.0, 0.0],
+};
+pub const WHITE: Color = Color {
+    rgb: [1.0, 1.0, 1.0],
+};
+pub const RED: Color = Color {
+    rgb: [1.0, 0.0, 0.0],
+};
+pub const GREEN: Color = Color {
+    rgb: [0.0, 1.0, 0.0],
+};
+pub const BLUE: Color = Color {
+    rgb: [0.0, 0.0, 1.0],
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;

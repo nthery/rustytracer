@@ -2,7 +2,7 @@
 //!
 //! TRTC chapter 2
 
-use crate::color::Color;
+use crate::color::{self, Color};
 
 /// A 2D grid of pixels.
 pub struct Canvas {
@@ -17,7 +17,7 @@ impl Canvas {
         Canvas {
             width,
             height,
-            pixels: vec![Color::new(0.0, 0.0, 0.0); width * height],
+            pixels: vec![color::BLACK; width * height],
         }
     }
 
@@ -52,14 +52,14 @@ mod tests {
         assert_eq!(c.height(), 20);
 
         // All pixels are black
-        assert_eq!(*c.get(0, 0), Color::new(0.0, 0.0, 0.0));
-        assert_eq!(*c.get(9, 19), Color::new(0.0, 0.0, 0.0));
+        assert_eq!(*c.get(0, 0), color::BLACK);
+        assert_eq!(*c.get(9, 19), color::BLACK);
     }
 
     #[test]
     fn writing_pixel() {
         let mut c = Canvas::new(10, 20);
-        c.set(1, 2, &Color::new(1.0, 0.0, 0.0));
-        assert_eq!(*c.get(1, 2), Color::new(1.0, 0.0, 0.0));
+        c.set(1, 2, &color::RED);
+        assert_eq!(*c.get(1, 2), color::RED);
     }
 }
