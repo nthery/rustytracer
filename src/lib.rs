@@ -67,10 +67,24 @@ impl std::ops::Add for &Tuple {
     }
 }
 
+impl std::ops::Add for Tuple {
+    type Output = Tuple;
+    fn add(self, o: Self) -> Tuple {
+        &self + &o
+    }
+}
+
 impl std::ops::Sub for &Tuple {
     type Output = Tuple;
     fn sub(self, o: Self) -> Tuple {
         Tuple::new(self.x - o.x, self.y - o.y, self.z - o.z, self.w - o.w)
+    }
+}
+
+impl std::ops::Sub for Tuple {
+    type Output = Tuple;
+    fn sub(self, o: Self) -> Tuple {
+        &self - &o
     }
 }
 
