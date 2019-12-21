@@ -23,6 +23,10 @@ impl Color {
     pub fn blue(&self) -> f64 {
         self.rgb[2]
     }
+
+    pub fn channel(&self, i: usize) -> f64 {
+        self.rgb[i]
+    }
 }
 
 impl PartialEq for Color {
