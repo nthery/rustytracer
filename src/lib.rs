@@ -6,3 +6,4 @@
 // TODO: public or crate internal?
 pub mod color;
 pub mod tuple;
+pub mod canvas;
