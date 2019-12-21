@@ -2,7 +2,7 @@
 /// https://pragprog.com/book/jbtracer/the-ray-tracer-challenge
 use std::f64;
 
-/// A 3D point (w == 1.0) or vector (w == 0.0).
+/// A quadruplet that can represent a 3D point (w == 1.0) or vector (w == 0.0).
 #[derive(Debug)]
 pub struct Tuple {
     pub x: f64,
@@ -13,7 +13,6 @@ pub struct Tuple {
 
 impl Tuple {
     pub fn new(x: f64, y: f64, z: f64, w: f64) -> Tuple {
-        assert!(w == 0.0 || w == 1.0);
         Tuple { x, y, z, w }
     }
 
@@ -44,6 +43,20 @@ impl Tuple {
 impl PartialEq for Tuple {
     fn eq(&self, o: &Tuple) -> bool {
         self.x == o.x && self.y == o.y && self.z == o.z && self.w == o.w
+    }
+}
+
+impl std::ops::Neg for &Tuple {
+    type Output = Tuple;
+    fn neg(self) -> Tuple {
+        Tuple::new(-self.x, -self.y, -self.z, -self.w)
+    }
+}
+
+impl std::ops::Neg for Tuple {
+    type Output = Tuple;
+    fn neg(self) -> Tuple {
+        -&self
     }
 }
 
@@ -169,5 +182,13 @@ mod tests {
         let r = Tuple::new_vector(5.0, 6.0, 7.0);
         let diff = &l - &r;
         assert_eq!(diff, Tuple::new_vector(-2.0, -4.0, -6.0));
+    }
+
+    #[test]
+    fn negating_a_tuple() {
+        assert_eq!(
+            -Tuple::new(3.0, -2.0, 1.0, 4.0),
+            Tuple::new(-3.0, 2.0, -1.0, -4.0)
+        );
     }
 }
