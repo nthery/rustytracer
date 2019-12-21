@@ -3,6 +3,7 @@
 use std::f64;
 
 /// A quadruplet that can represent a 3D point (w == 1.0) or vector (w == 0.0).
+/// TODO: introduce Vector and Point types?
 #[derive(Debug)]
 pub struct Tuple {
     pub x: f64,
@@ -37,6 +38,10 @@ impl Tuple {
             && nearly_equal(self.y, other.y)
             && nearly_equal(self.z, other.z)
             && nearly_equal(self.w, other.w)
+    }
+
+    pub fn magnitude(&self) -> f64 {
+        (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
 }
 
@@ -230,5 +235,16 @@ mod tests {
     fn multiplying_tuple_by_fraction() {
         let a = Tuple::new(1.0, -2.0, 3.0, -4.0);
         assert_eq!(a * 0.5, Tuple::new(0.5, -1.0, 1.5, -2.0));
+    }
+
+    #[test]
+    fn magnitude() {
+        assert_eq!(Tuple::new_vector(0.0, 1.0, 0.0).magnitude(), 1.0);
+        assert_eq!(Tuple::new_vector(0.0, 0.0, 1.0).magnitude(), 1.0);
+        assert_eq!(Tuple::new_vector(1.0, 2.0, 3.0).magnitude(), 14_f64.sqrt());
+        assert_eq!(
+            Tuple::new_vector(-1.0, -2.0, -3.0).magnitude(),
+            14_f64.sqrt()
+        );
     }
 }
