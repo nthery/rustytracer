@@ -45,6 +45,16 @@ impl Tuple {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z) + (self.w * other.w)
     }
 
+    // Return cross product.
+    pub fn cross(&self, o: &Tuple) -> Tuple {
+        assert!(self.is_vector() && o.is_vector());
+        Tuple::new_vector(
+            self.y * o.z - self.z * o.y,
+            self.z * o.x - self.x * o.z,
+            self.x * o.y - self.y * o.x,
+        )
+    }
+
     pub fn magnitude(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
@@ -278,5 +288,13 @@ mod tests {
             ),
             20.0
         );
+    }
+
+    #[test]
+    fn cross_product() {
+        let l = Tuple::new_vector(1.0, 2.0, 3.0);
+        let r = Tuple::new_vector(2.0, 3.0, 4.0);
+        assert_eq!(Tuple::cross(&l, &r), Tuple::new_vector(-1.0, 2.0, -1.0));
+        assert_eq!(Tuple::cross(&r, &l), Tuple::new_vector(1.0, -2.0, 1.0));
     }
 }
