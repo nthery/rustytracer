@@ -1,5 +1,5 @@
 /// Ray tracing library developed with
-/// https://pragprog.com/book/jbtracer/the-ray-tracer-challenge
+/// TRTC book (https://pragprog.com/book/jbtracer/the-ray-tracer-challenge)
 use std::f64;
 
 /// A quadruplet that can represent a 3D point (w == 1.0) or vector (w == 0.0).
@@ -42,6 +42,11 @@ impl Tuple {
 
     pub fn magnitude(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
+    }
+
+    pub fn normalize(&self) -> Tuple {
+        let m = self.magnitude();
+        Tuple::new(self.x / m, self.y / m, self.z / m, self.w / m)
     }
 }
 
@@ -107,22 +112,13 @@ impl std::ops::Mul<f64> for Tuple {
     }
 }
 
-// Stolen from https://users.rust-lang.org/t/assert-eq-for-float-numbers/7034/4
+/// Return true if arguments are approximatevely equal.
+/// We use the implementation from TRTC so that we can copy-paste tests easily.
+///
+/// This is probably not the best implementation.  See for example:
+/// https://users.rust-lang.org/t/assert-eq-for-float-numbers/7034/4
 fn nearly_equal(a: f64, b: f64) -> bool {
-    let abs_a = a.abs();
-    let abs_b = b.abs();
-    let diff = (a - b).abs();
-
-    if a == b {
-        // Handle infinities.
-        true
-    } else if a == 0.0 || b == 0.0 || diff < f64::MIN_POSITIVE {
-        // One of a or b is zero (or both are extremely close to it,) use absolute error.
-        diff < (f64::EPSILON * f64::MIN_POSITIVE)
-    } else {
-        // Use relative error.
-        (diff / f64::min(abs_a + abs_b, f64::MAX)) < f64::EPSILON
-    }
+    (a - b).abs() < 0.00001
 }
 
 #[cfg(test)]
@@ -245,6 +241,26 @@ mod tests {
         assert_eq!(
             Tuple::new_vector(-1.0, -2.0, -3.0).magnitude(),
             14_f64.sqrt()
+        );
+    }
+
+    #[test]
+    fn normalizing_vector() {
+        assert_eq!(
+            Tuple::new_vector(4.0, 0.0, 0.0).normalize(),
+            Tuple::new_vector(1.0, 0.0, 0.0)
+        );
+        assert!(Tuple::nearly_equal(
+            &Tuple::new_vector(1.0, 2.0, 3.0).normalize(),
+            &Tuple::new_vector(0.26726, 0.53452, 0.80178)
+        ));
+    }
+
+    #[test]
+    fn magnitude_of_normalized_vector_is_one() {
+        assert_eq!(
+            Tuple::new_vector(1.0, 2.0, 3.0).normalize().magnitude(),
+            1.0
         );
     }
 }
