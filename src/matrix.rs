@@ -2,6 +2,8 @@
 //!
 //! TRTC chapter 3.
 
+use crate::util;
+
 /// A 2D matrix of f64 values.
 ///
 /// TODO: Make it generic over dimensions when generic value parameters supported.
@@ -57,6 +59,20 @@ impl Matrix {
         assert!(c < self.ncols);
         self.cells[r * self.nrows + c]
     }
+
+    /// Return true if arguments are approximately equal.
+    pub fn nearly_equal(&self, o: &Matrix) -> bool {
+        if self.nrows != o.nrows || self.ncols != o.ncols {
+            return false;
+        }
+        // TODO: Can use Iterator::cmp_by() when available.
+        for i in 0..self.cells.len() {
+            if !util::nearly_equal(self.cells[i], o.cells[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 #[cfg(test)]
@@ -87,5 +103,39 @@ mod tests {
         let m = Matrix::new_2x2(&[[1.0, 2.0], [5.5, 6.5]]);
         assert_eq!(m.get(0, 0), 1.0);
         assert_eq!(m.get(1, 1), 6.5);
+    }
+
+    #[test]
+    fn comparing_equal_matrices() {
+        let l = Matrix::new_4x4(&[
+            [1.0, 2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.0, 8.0],
+            [9.0, 8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0, 2.0],
+        ]);
+        let r = Matrix::new_4x4(&[
+            [1.0, 2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.0, 8.0],
+            [9.0, 8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0, 2.0],
+        ]);
+        assert!(Matrix::nearly_equal(&l, &r));
+    }
+
+    #[test]
+    fn comparing_different_matrices() {
+        let l = Matrix::new_4x4(&[
+            [1.0, 2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.0, 8.0],
+            [9.0, 8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0, 2.0],
+        ]);
+        let r = Matrix::new_4x4(&[
+            [5.0, 6.0, 7.0, 8.0],
+            [1.0, 2.0, 3.0, 4.0],
+            [9.0, 8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0, 2.0],
+        ]);
+        assert!(!Matrix::nearly_equal(&l, &r));
     }
 }
