@@ -2,6 +2,8 @@
 //!
 //! TRTC chapter 2
 
+use std::io::{self, BufWriter, Write};
+
 use crate::color::{self, Color};
 
 const PPM_MAX_COLOR_VALUE: i32 = 255;
@@ -50,22 +52,23 @@ impl Canvas {
         }
     }
 
-    /// Convert this canvas to PPM format.
-    /// TODO: return sequence of u8 instead?
-    pub fn to_ppm(&self) -> String {
-        format!("{}{}", self.ppm_header(), self.ppm_data())
+    /// Export this canvas to PPM format.
+    pub fn to_ppm<W: Write>(&self, writer: W) -> io::Result<()> {
+        let mut bw = BufWriter::new(writer);
+        self.write_ppm_header(&mut bw)?;
+        self.write_ppm_data(&mut bw)?;
+        bw.flush()
     }
 
-    fn ppm_header(&self) -> String {
-        format!(
+    fn write_ppm_header<W: Write>(&self, writer: &mut W) -> io::Result<()> {
+        write!(
+            writer,
             "P3\n{} {}\n{}\n",
             self.width, self.height, PPM_MAX_COLOR_VALUE
         )
     }
 
-    fn ppm_data(&self) -> String {
-        let mut ppm = String::new();
-
+    fn write_ppm_data<W: Write>(&self, writer: &mut W) -> io::Result<()> {
         // Number of characters on current line.
         let mut nb_chars = 0;
 
@@ -77,7 +80,7 @@ impl Canvas {
                 // We've emitted a full row, go to the next line.
                 nb_colors = 0;
                 nb_chars = 0;
-                ppm.push('\n');
+                write!(writer, "\n")?
             }
             nb_colors += 1;
 
@@ -87,22 +90,22 @@ impl Canvas {
                 if nb_chars + s.len() >= PPM_MAX_CHAR_PER_LINE {
                     // Adding the current channel would overflow, go to next line.
                     nb_chars = 0;
-                    ppm.push('\n');
+                    write!(writer, "\n")?
                 } else if nb_chars > 0 {
                     // Not first channel on line.
                     nb_chars += 1;
-                    ppm.push(' ');
+                    write!(writer, " ")?
                 }
                 nb_chars += s.len();
-                ppm += s.as_str();
+                write!(writer, "{}", s)?
             }
         }
 
         if nb_chars > 0 {
-            ppm.push('\n');
+            write!(writer, "\n")?
         }
 
-        ppm
+        Ok(())
     }
 }
 
@@ -141,10 +144,12 @@ mod tests {
     }
 
     #[test]
-    fn constructing_ppm_header() {
+    fn constructing_ppm_header_u8() {
         let canvas = Canvas::new(5, 3);
         let want = "P3\n5 3\n255\n";
-        assert_eq!(canvas.ppm_header(), want);
+        let mut got = Vec::new();
+        canvas.write_ppm_header(&mut got).unwrap();
+        assert_eq!(String::from_utf8(got).unwrap(), want);
     }
 
     #[test]
@@ -156,7 +161,9 @@ mod tests {
         let want = "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n\
                     0 0 0 0 0 0 0 128 0 0 0 0 0 0 0\n\
                     0 0 0 0 0 0 0 0 0 0 0 0 0 0 255\n";
-        assert_eq!(canvas.ppm_data(), want);
+        let mut got = Vec::new();
+        canvas.write_ppm_data(&mut got).unwrap();
+        assert_eq!(String::from_utf8(got).unwrap(), want);
     }
 
     #[test]
@@ -167,6 +174,8 @@ mod tests {
                     153 255 204 153 255 204 153 255 204 153 255 204 153\n\
                     255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204\n\
                     153 255 204 153 255 204 153 255 204 153 255 204 153\n";
-        assert_eq!(canvas.ppm_data(), want);
+        let mut got = Vec::new();
+        canvas.write_ppm_data(&mut got).unwrap();
+        assert_eq!(String::from_utf8(got).unwrap(), want);
     }
 }
