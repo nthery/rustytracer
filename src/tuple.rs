@@ -4,6 +4,7 @@
 //!
 //! TODO: Implement Tuple as array (like Color)?
 
+use crate::util;
 use std::f64;
 
 /// A quadruplet that can represent a 3D point (w == 1.0) or vector (w == 0.0).
@@ -38,10 +39,10 @@ impl Tuple {
     }
 
     pub fn nearly_equal(&self, other: &Tuple) -> bool {
-        nearly_equal(self.x, other.x)
-            && nearly_equal(self.y, other.y)
-            && nearly_equal(self.z, other.z)
-            && nearly_equal(self.w, other.w)
+        util::nearly_equal(self.x, other.x)
+            && util::nearly_equal(self.y, other.y)
+            && util::nearly_equal(self.z, other.z)
+            && util::nearly_equal(self.w, other.w)
     }
 
     // Return dot product.
@@ -129,15 +130,6 @@ impl std::ops::Mul<f64> for Tuple {
     fn mul(self, o: f64) -> Self::Output {
         &self * o
     }
-}
-
-/// Return true if arguments are approximatevely equal.
-/// We use the implementation from TRTC so that we can copy-paste tests easily.
-///
-/// This is probably not the best implementation.  See for example:
-/// https://users.rust-lang.org/t/assert-eq-for-float-numbers/7034/4
-fn nearly_equal(a: f64, b: f64) -> bool {
-    (a - b).abs() < 0.00001
 }
 
 #[cfg(test)]
