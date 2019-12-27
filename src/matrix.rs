@@ -35,6 +35,14 @@ impl Matrix {
         }
     }
 
+    pub fn new_4x4_identity() -> Matrix {
+        let mut m = Matrix::new(4, 4);
+        for i in 0..4 {
+            m.set(i, i, 1.0)
+        }
+        m
+    }
+
     /// Create a new 3x3 matrix containing the given values.
     pub fn new_3x3(values: &[[f64; 3]; 3]) -> Matrix {
         let cells = values.iter().flatten().cloned().collect::<Vec<f64>>();
@@ -234,5 +242,16 @@ mod tests {
         ]);
         let t = Tuple::new(1.0, 2.0, 3.0, 1.0);
         assert_eq!(&m * &t, Tuple::new(18.0, 24.0, 33.0, 1.0));
+    }
+
+    #[test]
+    fn multiplying_matrix_by_identity() {
+        let m = Matrix::new_4x4(&[
+            [1.0, 2.0, 3.0, 4.0],
+            [2.0, 4.0, 4.0, 2.0],
+            [8.0, 6.0, 4.0, 1.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]);
+        assert_eq!(&m * &Matrix::new_4x4_identity(), m);
     }
 }
