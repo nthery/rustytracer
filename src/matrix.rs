@@ -85,6 +85,27 @@ impl PartialEq for Matrix {
     }
 }
 
+impl std::ops::Mul for &Matrix {
+    type Output = Matrix;
+
+    /// Multiply given matrices.
+    /// TODO: naive algorithm
+    fn mul(self, o: Self) -> Self::Output {
+        assert_eq!(self.nrows, o.ncols);
+        let mut res = Matrix::new(o.ncols, self.nrows);
+        for r in 0..self.nrows {
+            for c in 0..self.ncols {
+                let mut dot = 0.0;
+                for i in 0..self.nrows {
+                    dot += self.get(r, i) * o.get(i, c);
+                }
+                res.set(r, c, dot);
+            }
+        }
+        res
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -156,5 +177,30 @@ mod tests {
             [5.0, 4.0, 3.0, 2.0],
         ]);
         assert_ne!(l, r);
+    }
+
+    #[test]
+    fn multiplying_matrices() {
+        let l = Matrix::new_4x4(&[
+            [1.0, 2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.0, 8.0],
+            [9.0, 8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0, 2.0],
+        ]);
+        let r = Matrix::new_4x4(&[
+            [-2.0, 1.0, 2.0, 3.0],
+            [3.0, 2.0, 1.0, -1.0],
+            [4.0, 3.0, 6.0, 5.0],
+            [1.0, 2.0, 7.0, 8.0],
+        ]);
+        assert_eq!(
+            &l * &r,
+            Matrix::new_4x4(&[
+                [20.0, 22.0, 50.0, 48.0],
+                [44.0, 54.0, 114.0, 108.0],
+                [40.0, 58.0, 110.0, 102.0],
+                [16.0, 26.0, 46.0, 42.0],
+            ])
+        );
     }
 }
