@@ -94,6 +94,34 @@ impl Matrix {
         assert!(self.nrows == 2 && self.ncols == 2);
         self.get(0, 0) * self.get(1, 1) - self.get(0, 1) * self.get(1, 0)
     }
+
+    /// Return copy of this matrix without specified row and column.
+    /// TODO: Return view (slice) on existing matrix?
+    pub fn submatrix(&self, row: usize, col: usize) -> Matrix {
+        assert!(row < self.nrows && col < self.ncols);
+        assert!(self.nrows > 1 && self.ncols > 1);
+
+        // TODO: useless init
+        let mut m = Matrix::new(self.nrows - 1, self.ncols - 1);
+
+        let mut dst_row = 0;
+        for src_row in 0..self.nrows {
+            if src_row == row {
+                continue;
+            }
+            let mut dst_col = 0;
+            for src_col in 0..self.ncols {
+                if src_col == col {
+                    continue;
+                }
+                m.set(dst_row, dst_col, self.get(src_row, src_col));
+                dst_col += 1;
+            }
+            dst_row += 1;
+        }
+
+        m
+    }
 }
 
 impl PartialEq for Matrix {
@@ -296,5 +324,28 @@ mod tests {
     fn calculating_determinant_of_2x2_matrix() {
         let m = Matrix::new_2x2(&[[1.0, 5.0], [-3.0, 2.0]]);
         assert_eq!(m.determinant(), 17.0);
+    }
+
+    #[test]
+    fn submatrix_of_3x3_is_2x2() {
+        let m = Matrix::new_3x3(&[[1.0, 5.0, 0.0], [-3.0, 2.0, 7.0], [0.0, 6.0, -3.0]]);
+        assert_eq!(
+            m.submatrix(0, 2),
+            Matrix::new_2x2(&[[-3.0, 2.0], [0.0, 6.0]])
+        );
+    }
+
+    #[test]
+    fn submatrix_of_4x4_is_3x3() {
+        let m = Matrix::new_4x4(&[
+            [-6.0, 1.0, 1.0, 6.0],
+            [-8.0, 5.0, 8.0, 6.0],
+            [-1.0, 0.0, 8.0, 2.0],
+            [-7.0, 1.0, -1.0, 1.0],
+        ]);
+        assert_eq!(
+            m.submatrix(2, 1),
+            Matrix::new_3x3(&[[-6.0, 1.0, 6.0], [-8.0, 8.0, 6.0], [-7.0, -1.0, 1.0],])
+        );
     }
 }
