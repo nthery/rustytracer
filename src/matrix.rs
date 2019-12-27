@@ -122,6 +122,15 @@ impl Matrix {
 
         m
     }
+
+    /// Returns the minor of the element at `(row, col)`.
+    pub fn minor(&self, row: usize, col: usize) -> f64 {
+        // TODO: implement for non 3x3
+        assert!(self.nrows == 3 && self.ncols == 3);
+
+        // TODO: avoid creation of temporary submatrix
+        self.submatrix(row, col).determinant()
+    }
 }
 
 impl PartialEq for Matrix {
@@ -347,5 +356,13 @@ mod tests {
             m.submatrix(2, 1),
             Matrix::new_3x3(&[[-6.0, 1.0, 6.0], [-8.0, 8.0, 6.0], [-7.0, -1.0, 1.0],])
         );
+    }
+
+    #[test]
+    fn calculating_minor_of_3x3_matrix() {
+        let m = Matrix::new_3x3(&[[3.0, 5.0, 0.0], [2.0, -1.0, -7.0], [6.0, 1.0, 5.0]]);
+        let s = m.submatrix(1, 0);
+        assert_eq!(s.determinant(), 25.0);
+        assert_eq!(m.minor(1, 0), 25.0);
     }
 }
