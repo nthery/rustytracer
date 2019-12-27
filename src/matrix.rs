@@ -60,6 +60,13 @@ impl Matrix {
         assert!(c < self.ncols);
         self.cells[r * self.nrows + c]
     }
+
+    /// Change the cell at the specified row and column to the specified value.
+    pub fn set(&mut self, r: usize, c: usize, v: f64) {
+        assert!(r < self.nrows);
+        assert!(c < self.ncols);
+        self.cells[r * self.nrows + c] = v;
+    }
 }
 
 impl PartialEq for Matrix {
@@ -106,6 +113,15 @@ mod tests {
         let m = Matrix::new_2x2(&[[1.0, 2.0], [5.5, 6.5]]);
         assert_eq!(m.get(0, 0), 1.0);
         assert_eq!(m.get(1, 1), 6.5);
+    }
+
+    #[test]
+    fn setting_and_getting_cells() {
+        let mut m = Matrix::new(2, 2);
+        m.set(0, 0, 42.0);
+        m.set(1, 0, 24.0);
+        assert_eq!(m.get(0, 0), 42.0);
+        assert_eq!(m.get(1, 0), 24.0);
     }
 
     #[test]
