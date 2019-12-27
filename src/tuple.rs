@@ -80,24 +80,10 @@ impl std::ops::Neg for &Tuple {
     }
 }
 
-impl std::ops::Neg for Tuple {
-    type Output = Tuple;
-    fn neg(self) -> Tuple {
-        -&self
-    }
-}
-
 impl std::ops::Add for &Tuple {
     type Output = Tuple;
     fn add(self, o: Self) -> Tuple {
         Tuple::new(self.x + o.x, self.y + o.y, self.z + o.z, self.w + o.w)
-    }
-}
-
-impl std::ops::Add for Tuple {
-    type Output = Tuple;
-    fn add(self, o: Self) -> Tuple {
-        &self + &o
     }
 }
 
@@ -108,24 +94,10 @@ impl std::ops::Sub for &Tuple {
     }
 }
 
-impl std::ops::Sub for Tuple {
-    type Output = Tuple;
-    fn sub(self, o: Self) -> Tuple {
-        &self - &o
-    }
-}
-
 impl std::ops::Mul<f64> for &Tuple {
     type Output = Tuple;
     fn mul(self, o: f64) -> Self::Output {
         Tuple::new(self.x * o, self.y * o, self.z * o, self.w * o)
-    }
-}
-
-impl std::ops::Mul<f64> for Tuple {
-    type Output = Tuple;
-    fn mul(self, o: f64) -> Self::Output {
-        &self * o
     }
 }
 
@@ -224,7 +196,7 @@ mod tests {
     #[test]
     fn negating_a_tuple() {
         assert_eq!(
-            -Tuple::new(3.0, -2.0, 1.0, 4.0),
+            -&Tuple::new(3.0, -2.0, 1.0, 4.0),
             Tuple::new(-3.0, 2.0, -1.0, -4.0)
         );
     }
@@ -232,13 +204,13 @@ mod tests {
     #[test]
     fn multiplying_tuple_by_scalar() {
         let a = Tuple::new(1.0, -2.0, 3.0, -4.0);
-        assert_eq!(a * 3.5, Tuple::new(3.5, -7.0, 10.5, -14.0));
+        assert_eq!(&a * 3.5, Tuple::new(3.5, -7.0, 10.5, -14.0));
     }
 
     #[test]
     fn multiplying_tuple_by_fraction() {
         let a = Tuple::new(1.0, -2.0, 3.0, -4.0);
-        assert_eq!(a * 0.5, Tuple::new(0.5, -1.0, 1.5, -2.0));
+        assert_eq!(&a * 0.5, Tuple::new(0.5, -1.0, 1.5, -2.0));
     }
 
     #[test]

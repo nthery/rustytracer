@@ -46,13 +46,6 @@ impl std::ops::Add for &Color {
     }
 }
 
-impl std::ops::Add for Color {
-    type Output = Color;
-    fn add(self, o: Self) -> Self::Output {
-        &self + &o
-    }
-}
-
 impl std::ops::Sub for &Color {
     type Output = Color;
     fn sub(self, o: Self) -> Self::Output {
@@ -64,24 +57,10 @@ impl std::ops::Sub for &Color {
     }
 }
 
-impl std::ops::Sub for Color {
-    type Output = Color;
-    fn sub(self, o: Self) -> Self::Output {
-        &self - &o
-    }
-}
-
 impl std::ops::Mul<f64> for &Color {
     type Output = Color;
     fn mul(self, o: f64) -> Self::Output {
         Color::new(self.rgb[0] * o, self.rgb[1] * o, self.rgb[2] * o)
-    }
-}
-
-impl std::ops::Mul<f64> for Color {
-    type Output = Color;
-    fn mul(self, o: f64) -> Self::Output {
-        &self * o
     }
 }
 
@@ -93,13 +72,6 @@ impl std::ops::Mul for &Color {
             self.rgb[1] * o.rgb[1],
             self.rgb[2] * o.rgb[2],
         )
-    }
-}
-
-impl std::ops::Mul for Color {
-    type Output = Color;
-    fn mul(self, o: Self) -> Self::Output {
-        &self * &o
     }
 }
 
@@ -134,7 +106,7 @@ mod tests {
     #[test]
     fn adding_colors() {
         assert_eq!(
-            Color::new(0.9, 0.6, 0.75) + Color::new(0.7, 0.1, 0.25),
+            &Color::new(0.9, 0.6, 0.75) + &Color::new(0.7, 0.1, 0.25),
             Color::new(1.6, 0.7, 1.0)
         );
     }
@@ -142,20 +114,20 @@ mod tests {
     #[test]
     fn subtracting_colors() {
         assert_eq!(
-            Color::new(0.9, 0.6, 0.75) - Color::new(0.7, 0.1, 0.25),
+            &Color::new(0.9, 0.6, 0.75) - &Color::new(0.7, 0.1, 0.25),
             Color::new(0.20000000000000007, 0.5, 0.5)
         );
     }
 
     #[test]
     fn multiplying_color_by_scalar() {
-        assert_eq!(Color::new(0.2, 0.3, 0.4) * 2.0, Color::new(0.4, 0.6, 0.8));
+        assert_eq!(&Color::new(0.2, 0.3, 0.4) * 2.0, Color::new(0.4, 0.6, 0.8));
     }
 
     #[test]
     fn multiplying_colors() {
         assert_eq!(
-            Color::new(1.0, 0.2, 0.4) * Color::new(0.9, 1.0, 0.1),
+            &Color::new(1.0, 0.2, 0.4) * &Color::new(0.9, 1.0, 0.1),
             Color::new(0.9, 0.2, 0.04000000000000001)
         );
     }
