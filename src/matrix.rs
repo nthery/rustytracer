@@ -88,6 +88,12 @@ impl Matrix {
         }
         m
     }
+
+    pub fn determinant(&self) -> f64 {
+        // TODO: implement for non 2x2
+        assert!(self.nrows == 2 && self.ncols == 2);
+        self.get(0, 0) * self.get(1, 1) - self.get(0, 1) * self.get(1, 0)
+    }
 }
 
 impl PartialEq for Matrix {
@@ -284,5 +290,11 @@ mod tests {
                 [0.0, 8.0, 3.0, 8.0]
             ])
         );
+    }
+
+    #[test]
+    fn calculating_determinant_of_2x2_matrix() {
+        let m = Matrix::new_2x2(&[[1.0, 5.0], [-3.0, 2.0]]);
+        assert_eq!(m.determinant(), 17.0);
     }
 }
