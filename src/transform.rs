@@ -52,6 +52,18 @@ pub fn rotation_z(angle: f64) -> Matrix {
     res
 }
 
+/// Returns matrix encoding shearing effect.
+pub fn shearing(xy: f64, xz: f64, yx: f64, yz: f64, zx: f64, zy: f64) -> Matrix {
+    let mut res = Matrix::new_4x4_identity();
+    res.set(0, 1, xy);
+    res.set(0, 2, xz);
+    res.set(1, 0, yx);
+    res.set(1, 2, yz);
+    res.set(2, 0, zx);
+    res.set(2, 1, zy);
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -165,5 +177,47 @@ mod tests {
             Tuple::new_point(-2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0, 0.0)
         );
         assert_eq!(&full_quarter * &p, Tuple::new_point(-1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn shearing_moves_x_in_proportion_to_y() {
+        let t = shearing(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        let p = Tuple::new_point(2.0, 3.0, 4.0);
+        assert_eq!(&t * &p, Tuple::new_point(5.0, 3.0, 4.0));
+    }
+
+    #[test]
+    fn shearing_moves_x_in_proportion_to_z() {
+        let t = shearing(0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+        let p = Tuple::new_point(2.0, 3.0, 4.0);
+        assert_eq!(&t * &p, Tuple::new_point(6.0, 3.0, 4.0));
+    }
+
+    #[test]
+    fn shearing_moves_y_in_proportion_to_x() {
+        let t = shearing(0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        let p = Tuple::new_point(2.0, 3.0, 4.0);
+        assert_eq!(&t * &p, Tuple::new_point(2.0, 5.0, 4.0));
+    }
+
+    #[test]
+    fn shearing_moves_y_in_proportion_to_z() {
+        let t = shearing(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+        let p = Tuple::new_point(2.0, 3.0, 4.0);
+        assert_eq!(&t * &p, Tuple::new_point(2.0, 7.0, 4.0));
+    }
+
+    #[test]
+    fn shearing_moves_z_in_proportion_to_x() {
+        let t = shearing(0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        let p = Tuple::new_point(2.0, 3.0, 4.0);
+        assert_eq!(&t * &p, Tuple::new_point(2.0, 3.0, 6.0));
+    }
+
+    #[test]
+    fn shearing_moves_z_in_proportion_to_y() {
+        let t = shearing(0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        let p = Tuple::new_point(2.0, 3.0, 4.0);
+        assert_eq!(&t * &p, Tuple::new_point(2.0, 3.0, 7.0));
     }
 }
