@@ -134,9 +134,6 @@ impl Matrix {
 
     /// Returns the minor of element `(row, col)`.
     pub fn minor(&self, row: usize, col: usize) -> f64 {
-        // TODO: implement for non 3x3
-        assert!(self.nrows == 3 && self.ncols == 3);
-
         // TODO: avoid creation of temporary submatrix
         self.submatrix(row, col).determinant()
     }
@@ -145,6 +142,11 @@ impl Matrix {
     pub fn cofactor(&self, row: usize, col: usize) -> f64 {
         let f = if (row + col) & 1 == 1 { -1.0 } else { 1.0 };
         f * self.minor(row, col)
+    }
+
+    /// Returns true if this matrix is invertible.
+    pub fn invertible(&self) -> bool {
+        self.determinant() != 0.0
     }
 }
 
@@ -397,5 +399,29 @@ mod tests {
         assert_eq!(m.cofactor(0, 1), 12.0);
         assert_eq!(m.cofactor(0, 2), -46.0);
         assert_eq!(m.determinant(), -196.0);
+    }
+
+    #[test]
+    fn testing_invertible_matrix() {
+        let m = Matrix::new_4x4(&[
+            [6.0, 4.0, 4.0, 4.0],
+            [5.0, 5.0, 7.0, 6.0],
+            [4.0, -9.0, 3.0, -7.0],
+            [9.0, 1.0, 7.0, -6.0],
+        ]);
+        assert_eq!(m.determinant(), -2120.0);
+        assert!(m.invertible());
+    }
+
+    #[test]
+    fn testing_non_invertible_matrix() {
+        let m = Matrix::new_4x4(&[
+            [-4.0, 2.0, -2.0, -3.0],
+            [9.0, 6.0, 2.0, 6.0],
+            [0.0, -5.0, 1.0, -5.0],
+            [0.0, 0.0, 0.0, 0.0],
+        ]);
+        assert_eq!(m.determinant(), 0.0);
+        assert!(!m.invertible());
     }
 }
