@@ -2,102 +2,143 @@
 //!
 //! TRTC chapter 1.
 //!
-//! TODO: Implement Tuple as array (like Color)?
+//! TODO: Use iterator where possible rather than hand-coded loops
 
 use crate::util;
 use std::f64;
 
 /// A quadruplet that can represent a 3D point (w == 1.0) or vector (w == 0.0).
 /// TODO: introduce Vector and Point types?
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Tuple {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
-    pub w: f64,
+    xyzw: [f64; 4],
 }
 
 impl Tuple {
     pub fn new(x: f64, y: f64, z: f64, w: f64) -> Tuple {
-        Tuple { x, y, z, w }
+        Tuple { xyzw: [x, y, z, w] }
     }
 
     pub fn new_point(x: f64, y: f64, z: f64) -> Tuple {
-        Tuple { x, y, z, w: 1.0 }
+        Tuple {
+            xyzw: [x, y, z, 1.0],
+        }
     }
 
     pub fn new_vector(x: f64, y: f64, z: f64) -> Tuple {
-        Tuple { x, y, z, w: 0.0 }
+        Tuple {
+            xyzw: [x, y, z, 0.0],
+        }
     }
 
     pub fn is_point(&self) -> bool {
-        self.w == 1.0
+        self.w() == 1.0
     }
 
     pub fn is_vector(&self) -> bool {
-        self.w == 0.0
+        self.w() == 0.0
+    }
+
+    pub fn x(&self) -> f64 {
+        self.xyzw[0]
+    }
+
+    pub fn y(&self) -> f64 {
+        self.xyzw[1]
+    }
+
+    pub fn z(&self) -> f64 {
+        self.xyzw[2]
+    }
+
+    pub fn w(&self) -> f64 {
+        self.xyzw[3]
     }
 
     // Return dot product.
     pub fn dot(&self, other: &Tuple) -> f64 {
-        (self.x * other.x) + (self.y * other.y) + (self.z * other.z) + (self.w * other.w)
+        let mut res = 0.0;
+        for i in 0..4 {
+            res += self.xyzw[i] * other.xyzw[i];
+        }
+        res
     }
 
     // Return cross product.
     pub fn cross(&self, o: &Tuple) -> Tuple {
         assert!(self.is_vector() && o.is_vector());
         Tuple::new_vector(
-            self.y * o.z - self.z * o.y,
-            self.z * o.x - self.x * o.z,
-            self.x * o.y - self.y * o.x,
+            self.y() * o.z() - self.z() * o.y(),
+            self.z() * o.x() - self.x() * o.z(),
+            self.x() * o.y() - self.y() * o.x(),
         )
     }
 
     pub fn magnitude(&self) -> f64 {
-        (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
+        let mut res = 0.0;
+        for i in 0..4 {
+            res += self.xyzw[i] * self.xyzw[i];
+        }
+        res.sqrt()
     }
 
     pub fn normalize(&self) -> Tuple {
         let m = self.magnitude();
-        Tuple::new(self.x / m, self.y / m, self.z / m, self.w / m)
+        let mut res = (*self).clone();
+        for i in 0..4 {
+            res.xyzw[i] /= m;
+        }
+        res
     }
 }
 
 impl PartialEq for Tuple {
     /// Return true if arguments are approximately equal.
     fn eq(&self, o: &Tuple) -> bool {
-        util::nearly_equal(self.x, o.x)
-            && util::nearly_equal(self.y, o.y)
-            && util::nearly_equal(self.z, o.z)
-            && util::nearly_equal(self.w, o.w)
+        for i in 0..4 {
+            if !util::nearly_equal(self.xyzw[i], o.xyzw[i]) {
+                return false;
+            }
+        }
+        true
     }
 }
 
 impl std::ops::Neg for &Tuple {
     type Output = Tuple;
-    fn neg(self) -> Tuple {
-        Tuple::new(-self.x, -self.y, -self.z, -self.w)
+    fn neg(self) -> Self::Output {
+        Tuple::new(-self.x(), -self.y(), -self.z(), -self.w())
     }
 }
 
 impl std::ops::Add for &Tuple {
     type Output = Tuple;
-    fn add(self, o: Self) -> Tuple {
-        Tuple::new(self.x + o.x, self.y + o.y, self.z + o.z, self.w + o.w)
+    fn add(self, o: Self) -> Self::Output {
+        Tuple::new(
+            self.x() + o.x(),
+            self.y() + o.y(),
+            self.z() + o.z(),
+            self.w() + o.w(),
+        )
     }
 }
 
 impl std::ops::Sub for &Tuple {
     type Output = Tuple;
     fn sub(self, o: Self) -> Tuple {
-        Tuple::new(self.x - o.x, self.y - o.y, self.z - o.z, self.w - o.w)
+        Tuple::new(
+            self.x() - o.x(),
+            self.y() - o.y(),
+            self.z() - o.z(),
+            self.w() - o.w(),
+        )
     }
 }
 
 impl std::ops::Mul<f64> for &Tuple {
     type Output = Tuple;
     fn mul(self, o: f64) -> Self::Output {
-        Tuple::new(self.x * o, self.y * o, self.z * o, self.w * o)
+        Tuple::new(self.x() * o, self.y() * o, self.z() * o, self.w() * o)
     }
 }
 
@@ -108,10 +149,10 @@ mod tests {
     #[test]
     fn tuple_with_w0_is_point() {
         let t = Tuple::new(4.3, -4.2, 3.1, 1.0);
-        assert_eq!(t.x, 4.3);
-        assert_eq!(t.y, -4.2);
-        assert_eq!(t.z, 3.1);
-        assert_eq!(t.w, 1.0);
+        assert_eq!(t.x(), 4.3);
+        assert_eq!(t.y(), -4.2);
+        assert_eq!(t.z(), 3.1);
+        assert_eq!(t.w(), 1.0);
         assert!(t.is_point());
         assert!(!t.is_vector());
     }
@@ -119,10 +160,10 @@ mod tests {
     #[test]
     fn tuple_with_w1_is_vector() {
         let t = Tuple::new(4.3, -4.2, 3.1, 0.0);
-        assert_eq!(t.x, 4.3);
-        assert_eq!(t.y, -4.2);
-        assert_eq!(t.z, 3.1);
-        assert_eq!(t.w, 0.0);
+        assert_eq!(t.x(), 4.3);
+        assert_eq!(t.y(), -4.2);
+        assert_eq!(t.z(), 3.1);
+        assert_eq!(t.w(), 0.0);
         assert!(!t.is_point());
         assert!(t.is_vector());
     }
@@ -130,20 +171,20 @@ mod tests {
     #[test]
     fn create_point() {
         let t = Tuple::new_point(4.3, -4.2, 3.1);
-        assert_eq!(t.x, 4.3);
-        assert_eq!(t.y, -4.2);
-        assert_eq!(t.z, 3.1);
-        assert_eq!(t.w, 1.0);
+        assert_eq!(t.x(), 4.3);
+        assert_eq!(t.y(), -4.2);
+        assert_eq!(t.z(), 3.1);
+        assert_eq!(t.w(), 1.0);
         assert!(t.is_point());
     }
 
     #[test]
     fn create_vector() {
         let t = Tuple::new_vector(4.3, -4.2, 3.1);
-        assert_eq!(t.x, 4.3);
-        assert_eq!(t.y, -4.2);
-        assert_eq!(t.z, 3.1);
-        assert_eq!(t.w, 0.0);
+        assert_eq!(t.x(), 4.3);
+        assert_eq!(t.y(), -4.2);
+        assert_eq!(t.z(), 3.1);
+        assert_eq!(t.w(), 0.0);
         assert!(t.is_vector());
     }
 
@@ -231,8 +272,8 @@ mod tests {
             Tuple::new_vector(1.0, 0.0, 0.0)
         );
         assert_eq!(
-            &Tuple::new_vector(1.0, 2.0, 3.0).normalize(),
-            &Tuple::new_vector(0.26726, 0.53452, 0.80178)
+            Tuple::new_vector(1.0, 2.0, 3.0).normalize(),
+            Tuple::new_vector(0.26726, 0.53452, 0.80178)
         );
     }
 
