@@ -22,12 +22,22 @@ pub fn scaling(x: f64, y: f64, z: f64) -> Matrix {
     res
 }
 
-/// Returns matrix encoding rotation of `angle` radiants arond the x axis.
+/// Returns matrix encoding rotation of `angle` radiants arond the x-axis.
 pub fn rotation_x(angle: f64) -> Matrix {
     let mut res = Matrix::new_4x4_identity();
     res.set(1, 1, angle.cos());
     res.set(1, 2, -angle.sin());
     res.set(2, 1, angle.sin());
+    res.set(2, 2, angle.cos());
+    res
+}
+
+/// Returns matrix encoding rotation of `angle` radiants arond the y-axis.
+pub fn rotation_y(angle: f64) -> Matrix {
+    let mut res = Matrix::new_4x4_identity();
+    res.set(0, 0, angle.cos());
+    res.set(0, 2, angle.sin());
+    res.set(2, 0, -angle.sin());
     res.set(2, 2, angle.cos());
     res
 }
@@ -121,5 +131,17 @@ mod tests {
             &half_quarter.inverted() * &p,
             Tuple::new_point(0.0, 2_f64.sqrt() / 2.0, -2_f64.sqrt() / 2.0)
         );
+    }
+
+    #[test]
+    fn rotating_around_y_axis() {
+        let p = Tuple::new_point(0.0, 0.0, 1.0);
+        let half_quarter = rotation_y(PI / 4.0);
+        let full_quarter = rotation_y(PI / 2.0);
+        assert_eq!(
+            &half_quarter * &p,
+            Tuple::new_point(2_f64.sqrt() / 2.0, 0.0, 2_f64.sqrt() / 2.0)
+        );
+        assert_eq!(&full_quarter * &p, Tuple::new_point(1.0, 0.0, 0.0));
     }
 }
