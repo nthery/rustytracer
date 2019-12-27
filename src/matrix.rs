@@ -89,10 +89,19 @@ impl Matrix {
         m
     }
 
+    /// Returns determinant of this matrix.
     pub fn determinant(&self) -> f64 {
-        // TODO: implement for non 2x2
-        assert!(self.nrows == 2 && self.ncols == 2);
-        self.get(0, 0) * self.get(1, 1) - self.get(0, 1) * self.get(1, 0)
+        debug_assert!(self.nrows >= 2 && self.ncols >= 2);
+        if self.nrows == 2 && self.ncols == 2 {
+            self.get(0, 0) * self.get(1, 1) - self.get(0, 1) * self.get(1, 0)
+        } else {
+            let mut det = 0.0;
+            for i in 0..self.ncols {
+                // TODO: avoid creation of temporary submatrix in cofactor()
+                det += self.cells[i] * self.cofactor(0, i);
+            }
+            det
+        }
     }
 
     /// Return copy of this matrix without specified row and column.
@@ -379,5 +388,14 @@ mod tests {
         assert_eq!(m.cofactor(0, 0), -12.0);
         assert_eq!(m.minor(1, 0), 25.0);
         assert_eq!(m.cofactor(1, 0), -25.0);
+    }
+
+    #[test]
+    fn calculating_determinant_of_3x3_matrix() {
+        let m = Matrix::new_3x3(&[[1.0, 2.0, 6.0], [-5.0, 8.0, -4.0], [2.0, 6.0, 4.0]]);
+        assert_eq!(m.cofactor(0, 0), 56.0);
+        assert_eq!(m.cofactor(0, 1), 12.0);
+        assert_eq!(m.cofactor(0, 2), -46.0);
+        assert_eq!(m.determinant(), -196.0);
     }
 }
