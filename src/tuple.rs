@@ -31,6 +31,10 @@ impl Tuple {
         }
     }
 
+    pub fn new_zero() -> Tuple {
+        Tuple { xyzw: [0.0; 4] }
+    }
+
     pub fn is_point(&self) -> bool {
         self.w() == 1.0
     }

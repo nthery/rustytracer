@@ -2,6 +2,7 @@
 //!
 //! TRTC chapter 3.
 
+use crate::tuple::Tuple;
 use crate::util;
 
 /// A 2D matrix of f64 values.
@@ -106,6 +107,25 @@ impl std::ops::Mul for &Matrix {
     }
 }
 
+impl std::ops::Mul<&Tuple> for &Matrix {
+    type Output = Tuple;
+
+    /// Multiply given matrix and tuple.
+    /// TODO: naive algorithm
+    fn mul(self, o: &Tuple) -> Self::Output {
+        assert_eq!(self.ncols, 4);
+        let mut res = Tuple::new_zero(); // TODO: useless init
+        for r in 0..self.nrows {
+            let mut dot = 0.0;
+            for c in 0..self.ncols {
+                dot += self.get(r, c) * o.get(c);
+            }
+            res.set(r, dot);
+        }
+        res
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -202,5 +222,17 @@ mod tests {
                 [16.0, 26.0, 46.0, 42.0],
             ])
         );
+    }
+
+    #[test]
+    fn multiplying_matrix_and_tuple() {
+        let m = Matrix::new_4x4(&[
+            [1.0, 2.0, 3.0, 4.0],
+            [2.0, 4.0, 4.0, 2.0],
+            [8.0, 6.0, 4.0, 1.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]);
+        let t = Tuple::new(1.0, 2.0, 3.0, 1.0);
+        assert_eq!(&m * &t, Tuple::new(18.0, 24.0, 33.0, 1.0));
     }
 }
