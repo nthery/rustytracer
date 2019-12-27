@@ -123,13 +123,19 @@ impl Matrix {
         m
     }
 
-    /// Returns the minor of the element at `(row, col)`.
+    /// Returns the minor of element `(row, col)`.
     pub fn minor(&self, row: usize, col: usize) -> f64 {
         // TODO: implement for non 3x3
         assert!(self.nrows == 3 && self.ncols == 3);
 
         // TODO: avoid creation of temporary submatrix
         self.submatrix(row, col).determinant()
+    }
+
+    /// Returns cofactor of element `(row, col)`.
+    pub fn cofactor(&self, row: usize, col: usize) -> f64 {
+        let f = if (row + col) & 1 == 1 { -1.0 } else { 1.0 };
+        f * self.minor(row, col)
     }
 }
 
@@ -364,5 +370,14 @@ mod tests {
         let s = m.submatrix(1, 0);
         assert_eq!(s.determinant(), 25.0);
         assert_eq!(m.minor(1, 0), 25.0);
+    }
+
+    #[test]
+    fn calculating_cofactor_of_3x3_matrix() {
+        let m = Matrix::new_3x3(&[[3.0, 5.0, 0.0], [2.0, -1.0, -7.0], [6.0, -1.0, 5.0]]);
+        assert_eq!(m.minor(0, 0), -12.0);
+        assert_eq!(m.cofactor(0, 0), -12.0);
+        assert_eq!(m.minor(1, 0), 25.0);
+        assert_eq!(m.cofactor(1, 0), -25.0);
     }
 }
