@@ -7,6 +7,7 @@ use crate::util;
 /// A 2D matrix of f64 values.
 ///
 /// TODO: Make it generic over dimensions when generic value parameters supported.
+#[derive(Debug)]
 pub struct Matrix {
     nrows: usize,
     ncols: usize,
@@ -59,9 +60,11 @@ impl Matrix {
         assert!(c < self.ncols);
         self.cells[r * self.nrows + c]
     }
+}
 
+impl PartialEq for Matrix {
     /// Return true if arguments are approximately equal.
-    pub fn nearly_equal(&self, o: &Matrix) -> bool {
+    fn eq(&self, o: &Matrix) -> bool {
         if self.nrows != o.nrows || self.ncols != o.ncols {
             return false;
         }
@@ -119,7 +122,7 @@ mod tests {
             [9.0, 8.0, 7.0, 6.0],
             [5.0, 4.0, 3.0, 2.0],
         ]);
-        assert!(Matrix::nearly_equal(&l, &r));
+        assert_eq!(l, r);
     }
 
     #[test]
@@ -136,6 +139,6 @@ mod tests {
             [9.0, 8.0, 7.0, 6.0],
             [5.0, 4.0, 3.0, 2.0],
         ]);
-        assert!(!Matrix::nearly_equal(&l, &r));
+        assert_ne!(l, r);
     }
 }

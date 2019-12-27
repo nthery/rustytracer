@@ -38,13 +38,6 @@ impl Tuple {
         self.w == 0.0
     }
 
-    pub fn nearly_equal(&self, other: &Tuple) -> bool {
-        util::nearly_equal(self.x, other.x)
-            && util::nearly_equal(self.y, other.y)
-            && util::nearly_equal(self.z, other.z)
-            && util::nearly_equal(self.w, other.w)
-    }
-
     // Return dot product.
     pub fn dot(&self, other: &Tuple) -> f64 {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z) + (self.w * other.w)
@@ -71,8 +64,12 @@ impl Tuple {
 }
 
 impl PartialEq for Tuple {
+    /// Return true if arguments are approximately equal.
     fn eq(&self, o: &Tuple) -> bool {
-        self.x == o.x && self.y == o.y && self.z == o.z && self.w == o.w
+        util::nearly_equal(self.x, o.x)
+            && util::nearly_equal(self.y, o.y)
+            && util::nearly_equal(self.z, o.z)
+            && util::nearly_equal(self.w, o.w)
     }
 }
 
@@ -182,14 +179,14 @@ mod tests {
     fn tuples_with_same_values_are_equal() {
         let l = Tuple::new_point(1.1, 2.2, 3.3);
         let r = Tuple::new_point(1.1, 2.2, 3.3);
-        assert!(l.nearly_equal(&r));
+        assert_eq!(l, r);
     }
 
     #[test]
     fn tuples_with_very_similar_values_are_equal() {
         let l = Tuple::new_point(1.1, 2.2, 3.3);
         let r = Tuple::new_point(1.1, 2.2 - f64::EPSILON, 3.3);
-        assert!(l.nearly_equal(&r));
+        assert_eq!(l, r);
     }
 
     #[test]
@@ -261,10 +258,10 @@ mod tests {
             Tuple::new_vector(4.0, 0.0, 0.0).normalize(),
             Tuple::new_vector(1.0, 0.0, 0.0)
         );
-        assert!(Tuple::nearly_equal(
+        assert_eq!(
             &Tuple::new_vector(1.0, 2.0, 3.0).normalize(),
             &Tuple::new_vector(0.26726, 0.53452, 0.80178)
-        ));
+        );
     }
 
     #[test]
