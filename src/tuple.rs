@@ -55,6 +55,14 @@ impl Tuple {
         self.xyzw[3]
     }
 
+    pub fn get(&self, i: usize) -> f64 {
+        self.xyzw[i]
+    }
+
+    pub fn set(&mut self, i: usize, v: f64) {
+        self.xyzw[i] = v;
+    }
+
     // Return dot product.
     pub fn dot(&self, other: &Tuple) -> f64 {
         let mut res = 0.0;
@@ -186,6 +194,15 @@ mod tests {
         assert_eq!(t.z(), 3.1);
         assert_eq!(t.w(), 0.0);
         assert!(t.is_vector());
+    }
+
+    #[test]
+    fn set_and_get_tuple_values() {
+        let mut t = Tuple::new(1.0, 2.0, 3.0, 4.0);
+        t.set(0, 42.0);
+        t.set(3, 24.0);
+        assert_eq!(t.get(0), 42.0);
+        assert_eq!(t.get(3), 24.0);
     }
 
     #[test]
