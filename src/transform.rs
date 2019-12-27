@@ -1,6 +1,9 @@
 //! This module implements matrix transformations.
 //!
 //! See TRTC chapter 4.
+//!
+//! TODO: Multiplying more than 2 matrices is ugly becuse of explicit references.
+//! TODO: Is it possible to implement expression templates?
 
 use crate::matrix::Matrix;
 
@@ -219,5 +222,33 @@ mod tests {
         let t = shearing(0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
         let p = Tuple::new_point(2.0, 3.0, 4.0);
         assert_eq!(&t * &p, Tuple::new_point(2.0, 3.0, 7.0));
+    }
+
+    #[test]
+    fn individual_transforms_are_applied_in_sequence() {
+        let p = Tuple::new_point(1.0, 0.0, 1.0);
+        let rot = rotation_x(PI / 2.0);
+        let scal = scaling(5.0, 5.0, 5.0);
+        let trans = translation(10.0, 5.0, 7.0);
+
+        let p2 = &rot * &p;
+        assert_eq!(p2, Tuple::new_point(1.0, -1.0, 0.0));
+
+        let p3 = &scal * &p2;
+        assert_eq!(p3, Tuple::new_point(5.0, -5.0, 0.0));
+
+        let p4 = &trans * &p3;
+        assert_eq!(p4, Tuple::new_point(15.0, 0.0, 7.0));
+    }
+
+    #[test]
+    fn chained_transforms_are_applied_in_reverse_order() {
+        let p = Tuple::new_point(1.0, 0.0, 1.0);
+        let rot = rotation_x(PI / 2.0);
+        let scal = scaling(5.0, 5.0, 5.0);
+        let trans = translation(10.0, 5.0, 7.0);
+
+        let t = &(&trans * &scal) * &rot;
+        assert_eq!(&t * &p, Tuple::new_point(15.0, 0.0, 7.0));
     }
 }
