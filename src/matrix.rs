@@ -8,7 +8,7 @@ use crate::util;
 /// A 2D matrix of f64 values.
 ///
 /// TODO: Make it generic over dimensions when generic value parameters supported.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Matrix {
     nrows: usize,
     ncols: usize,
@@ -147,6 +147,26 @@ impl Matrix {
     /// Returns true if this matrix is invertible.
     pub fn invertible(&self) -> bool {
         self.determinant() != 0.0
+    }
+
+    /// Returns inverted version of this matrix.
+    pub fn inverted(&self) -> Matrix {
+        assert!(self.invertible());
+
+        // TODO: useless init
+        let mut im = Matrix::new(self.nrows, self.ncols);
+
+        // TODO: memoize it?
+        let det = self.determinant();
+
+        for r in 0..self.nrows {
+            for c in 0..self.ncols {
+                let cf = self.cofactor(r, c);
+                im.set(c, r, cf / det);
+            }
+        }
+
+        im
     }
 }
 
@@ -423,5 +443,83 @@ mod tests {
         ]);
         assert_eq!(m.determinant(), 0.0);
         assert!(!m.invertible());
+    }
+
+    #[test]
+    fn inverting_matrix() {
+        let m = Matrix::new_4x4(&[
+            [-5.0, 2.0, 6.0, -8.0],
+            [1.0, -5.0, 1.0, 8.0],
+            [7.0, 7.0, -6.0, -7.0],
+            [1.0, -3.0, 7.0, 4.0],
+        ]);
+        assert_eq!(m.determinant(), 532.0);
+        assert_eq!(m.cofactor(2, 3), -160.0);
+        assert_eq!(m.cofactor(3, 2), 105.0);
+
+        let im = m.inverted();
+        assert_eq!(im.get(3, 2), -160.0 / 532.0);
+        assert_eq!(im.get(2, 3), 105.0 / 532.0);
+        assert_eq!(
+            im,
+            Matrix::new_4x4(&[
+                [0.21805, 0.45113, 0.24060, -0.04511],
+                [-0.80827, -1.45677, -0.44361, 0.52068],
+                [-0.07895, -0.22368, -0.05263, 0.19737],
+                [-0.52256, -0.81391, -0.30075, 0.30639],
+            ])
+        );
+    }
+
+    #[test]
+    fn inverting_more_matrices() {
+        assert_eq!(
+            Matrix::new_4x4(&[
+                [8.0, -5.0, 9.0, 2.0],
+                [7.0, 5.0, 6.0, 1.0],
+                [-6.0, 0.0, 9.0, 6.0],
+                [-3.0, 0.0, -9.0, -4.0],
+            ])
+            .inverted(),
+            Matrix::new_4x4(&[
+                [-0.15385, -0.15385, -0.28205, -0.53846],
+                [-0.07692, 0.12308, 0.02564, 0.03077],
+                [0.35897, 0.35897, 0.43590, 0.92308],
+                [-0.69231, -0.69231, -0.76923, -1.92308],
+            ])
+        );
+        assert_eq!(
+            Matrix::new_4x4(&[
+                [9.0, 3.0, 0.0, 9.0],
+                [-5.0, -2.0, -6.0, -3.0],
+                [-4.0, 9.0, 6.0, 4.0],
+                [-7.0, 6.0, 6.0, 2.0],
+            ])
+            .inverted(),
+            Matrix::new_4x4(&[
+                [-0.04074, -0.07778, 0.14444, -0.22222],
+                [-0.07778, 0.03333, 0.36667, -0.33333],
+                [-0.02901, -0.14630, -0.10926, 0.12963],
+                [0.17778, 0.06667, -0.26667, 0.33333],
+            ])
+        );
+    }
+
+    #[test]
+    fn multiplying_product_by_inverse() {
+        let l = Matrix::new_4x4(&[
+            [3.0, -9.0, 7.0, 3.0],
+            [3.0, -8.0, 2.0, -9.0],
+            [-4.0, 4.0, 4.0, 1.0],
+            [-6.0, 5.0, -1.0, 1.0],
+        ]);
+        let r = Matrix::new_4x4(&[
+            [8.0, 2.0, 2.0, 2.0],
+            [3.0, -1.0, 7.0, 0.0],
+            [7.0, 0.0, 5.0, 4.0],
+            [6.0, -2.0, 0.0, 5.0],
+        ]);
+        let prod = &l * &r;
+        assert_eq!(&prod * &r.inverted(), l);
     }
 }
