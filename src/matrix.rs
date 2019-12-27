@@ -76,6 +76,18 @@ impl Matrix {
         assert!(c < self.ncols);
         self.cells[r * self.nrows + c] = v;
     }
+
+    /// Return transposition of this matrix.
+    /// TODO: transpose in place needed?
+    pub fn transposed(&self) -> Matrix {
+        let mut m = Matrix::new(self.ncols, self.nrows); // TODO: useless init
+        for r in 0..self.nrows {
+            for c in 0..self.ncols {
+                m.set(c, r, self.get(r, c));
+            }
+        }
+        m
+    }
 }
 
 impl PartialEq for Matrix {
@@ -253,5 +265,24 @@ mod tests {
             [0.0, 0.0, 0.0, 1.0],
         ]);
         assert_eq!(&m * &Matrix::new_4x4_identity(), m);
+    }
+
+    #[test]
+    fn transposing_matrix() {
+        let m = Matrix::new_4x4(&[
+            [0.0, 9.0, 3.0, 0.0],
+            [9.0, 8.0, 0.0, 8.0],
+            [1.0, 8.0, 5.0, 3.0],
+            [0.0, 0.0, 5.0, 8.0],
+        ]);
+        assert_eq!(
+            m.transposed(),
+            Matrix::new_4x4(&[
+                [0.0, 9.0, 1.0, 0.0],
+                [9.0, 8.0, 8.0, 0.0],
+                [3.0, 0.0, 5.0, 5.0],
+                [0.0, 8.0, 3.0, 8.0]
+            ])
+        );
     }
 }
