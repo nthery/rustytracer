@@ -80,7 +80,7 @@ impl Canvas {
                 // We've emitted a full row, go to the next line.
                 nb_colors = 0;
                 nb_chars = 0;
-                write!(writer, "\n")?
+                writeln!(writer)?
             }
             nb_colors += 1;
 
@@ -90,7 +90,7 @@ impl Canvas {
                 if nb_chars + s.len() >= PPM_MAX_CHAR_PER_LINE {
                     // Adding the current channel would overflow, go to next line.
                     nb_chars = 0;
-                    write!(writer, "\n")?
+                    writeln!(writer)?
                 } else if nb_chars > 0 {
                     // Not first channel on line.
                     nb_chars += 1;
@@ -102,7 +102,7 @@ impl Canvas {
         }
 
         if nb_chars > 0 {
-            write!(writer, "\n")?
+            writeln!(writer)?
         }
 
         Ok(())

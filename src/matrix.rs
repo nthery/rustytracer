@@ -182,7 +182,7 @@ impl PartialEq for Matrix {
                 return false;
             }
         }
-        return true;
+        true
     }
 }
 

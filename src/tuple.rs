@@ -36,11 +36,13 @@ impl Tuple {
     }
 
     pub fn is_point(&self) -> bool {
-        self.w() == 1.0
+        // cast to avoid clippy warning
+        self.w() as i32 == 1
     }
 
     pub fn is_vector(&self) -> bool {
-        self.w() == 0.0
+        // cast to avoid clippy warning
+        self.w() as i32 == 0
     }
 
     pub fn x(&self) -> f64 {
