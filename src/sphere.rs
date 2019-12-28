@@ -2,22 +2,34 @@
 //!
 //! TRTC chapter 5.
 
-/// A unit sphere centered on the origin.
+use std::rc::Rc;
+
+/// Per-sphere data.
 #[derive(Debug)]
+struct SphereRep;
+
+/// A unit sphere centered on the origin.
+///
+/// Spheres have identity so a `Sphere` value is a handle to a hidden representation.  Cloning a
+/// `Sphere` value creates a new handle to the same underlying representation.
+#[derive(Clone, Debug)]
 pub struct Sphere {
-    // The address of this field is a unique identifier of this sphere.  Its value is irrelevant.
-    id: u8,
+    // Add a layer of indirection to implement identity.
+    rep: Rc<Box<SphereRep>>,
 }
 
 impl Sphere {
+    /// Creates a new unique sphere.
     pub fn new() -> Sphere {
-        Sphere { id: 0 }
+        Sphere {
+            rep: Rc::new(Box::new(SphereRep)),
+        }
     }
 }
 
 impl PartialEq for Sphere {
     fn eq(&self, other: &Sphere) -> bool {
-        &self.id as *const u8 == &other.id as *const u8
+        Rc::ptr_eq(&self.rep, &other.rep)
     }
 }
 
@@ -26,7 +38,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn spheres_are_unique() {
+    fn new_creates_unique_spheres() {
         assert_ne!(Sphere::new(), Sphere::new());
+
+        let s = Sphere::new();
+        assert_eq!(s, s);
+    }
+
+    #[test]
+    fn sphere_is_clonable() {
+        let s = Sphere::new();
+        assert_eq!(s.clone(), s.clone());
     }
 }
