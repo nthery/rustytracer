@@ -17,6 +17,16 @@ impl Ray {
         Ray { origin, direction }
     }
 
+    /// Creates a ray from language tuples rather than `Tuple` values.
+    pub fn from_triplets(origin: (f64, f64, f64), direction: (f64, f64, f64)) -> Ray {
+        let (x, y, z) = origin;
+        let (dx, dy, dz) = direction;
+        Ray {
+            origin: Tuple::new_point(x, y, z),
+            direction: Tuple::new_vector(dx, dy, dz),
+        }
+    }
+
     pub fn origin(&self) -> &Tuple {
         &self.origin
     }
@@ -35,12 +45,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn creating_and_querying_ray() {
+    fn creating_ray_from_point_and_vector() {
         let o = Tuple::new_point(1.0, 2.0, 3.0);
         let d = Tuple::new_vector(4.0, 5.0, 6.0);
         let r = Ray::new(o.clone(), d.clone());
         assert_eq!(*r.origin(), o);
         assert_eq!(*r.direction(), d);
+    }
+
+    #[test]
+    fn creating_ray_from_triplets() {
+        let r = Ray::from_triplets((1.0, 2.0, 3.0), (4.0, 5.0, 6.0));
+        assert_eq!(*r.origin(), Tuple::new_point(1.0, 2.0, 3.0));
+        assert_eq!(*r.direction(), Tuple::new_vector(4.0, 5.0, 6.0));
     }
 
     #[test]
