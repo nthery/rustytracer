@@ -10,9 +10,8 @@ use crate::tuple::{Tuple, ORIGIN};
 
 /// Intersection between an object and a `Ray`.
 #[derive(PartialEq, Debug)]
-pub struct Intersection {
-    // TODO: reference instead?
-    pub sphere: Sphere,
+pub struct Intersection<'a> {
+    pub sphere: &'a Sphere,
 
     /// Distance from origin of intersecting ray.
     pub distance: f64,
@@ -24,7 +23,7 @@ pub trait IntersectionList {
     fn hit(&self) -> Option<&Intersection>;
 }
 
-impl IntersectionList for Vec<Intersection> {
+impl IntersectionList for Vec<Intersection<'_>> {
     fn hit(&self) -> Option<&Intersection> {
         self.iter().filter(|i| i.distance >= 0.0).min_by(|l, r| {
             if l.distance < r.distance {
@@ -40,7 +39,7 @@ impl IntersectionList for Vec<Intersection> {
 ///
 /// Returns sequence of intersections.  If there is no intersection, the sequence is empty.  If the
 /// ray is tangent to the sphere, the sequence contains two identical intersections.
-pub fn intersects(sphere: &Sphere, ray: &Ray) -> Vec<Intersection> {
+pub fn intersects<'a>(sphere: &'a Sphere, ray: &Ray) -> Vec<Intersection<'a>> {
     let sphere_to_ray = ray.origin() - &ORIGIN;
     let a = Tuple::dot(ray.direction(), ray.direction());
     let b = 2.0 * Tuple::dot(ray.direction(), &sphere_to_ray);
@@ -54,11 +53,11 @@ pub fn intersects(sphere: &Sphere, ray: &Ray) -> Vec<Intersection> {
         vec![
             Intersection {
                 distance: (-b - dis_sqrt) / a2,
-                sphere: sphere.clone(),
+                sphere,
             },
             Intersection {
                 distance: (-b + dis_sqrt) / a2,
-                sphere: sphere.clone(),
+                sphere,
             },
         ]
     }
@@ -77,11 +76,11 @@ mod tests {
             xs,
             [
                 Intersection {
-                    sphere: s.clone(),
+                    sphere: &s,
                     distance: 4.0
                 },
                 Intersection {
-                    sphere: s.clone(),
+                    sphere: &s,
                     distance: 6.0
                 }
             ]
@@ -97,11 +96,11 @@ mod tests {
             xs,
             [
                 Intersection {
-                    sphere: s.clone(),
+                    sphere: &s,
                     distance: 5.0
                 },
                 Intersection {
-                    sphere: s.clone(),
+                    sphere: &s,
                     distance: 5.0
                 }
             ]
@@ -125,11 +124,11 @@ mod tests {
             xs,
             [
                 Intersection {
-                    sphere: s.clone(),
+                    sphere: &s,
                     distance: -1.0
                 },
                 Intersection {
-                    sphere: s.clone(),
+                    sphere: &s,
                     distance: 1.0
                 }
             ]
@@ -145,11 +144,11 @@ mod tests {
             xs,
             [
                 Intersection {
-                    sphere: s.clone(),
+                    sphere: &s,
                     distance: -6.0
                 },
                 Intersection {
-                    sphere: s.clone(),
+                    sphere: &s,
                     distance: -4.0
                 }
             ]
@@ -167,11 +166,11 @@ mod tests {
         let s = Sphere::new();
         let xs = vec![
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: 1.0,
             },
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: 2.0,
             },
         ];
@@ -183,11 +182,11 @@ mod tests {
         let s = Sphere::new();
         let xs = vec![
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: -1.0,
             },
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: 1.0,
             },
         ];
@@ -199,11 +198,11 @@ mod tests {
         let s = Sphere::new();
         let xs = vec![
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: -2.0,
             },
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: -1.0,
             },
         ];
@@ -215,19 +214,19 @@ mod tests {
         let s = Sphere::new();
         let xs = vec![
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: 5.0,
             },
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: 7.0,
             },
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: -3.0,
             },
             Intersection {
-                sphere: s.clone(),
+                sphere: &s,
                 distance: 2.0,
             },
         ];
