@@ -7,6 +7,11 @@
 use crate::util;
 use std::f64;
 
+/// A point at the origin of the coordinate system.
+pub const ORIGIN: Tuple = Tuple {
+    xyzw: [0.0, 0.0, 0.0, 1.0],
+};
+
 /// A quadruplet that can represent a 3D point (w == 1.0) or vector (w == 0.0).
 /// TODO: introduce Vector and Point types?
 #[derive(Clone, Debug)]

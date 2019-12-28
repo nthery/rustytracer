@@ -6,6 +6,7 @@
 // TODO: public or crate internal?
 pub mod canvas;
 pub mod color;
+pub mod inter;
 pub mod matrix;
 pub mod ray;
 pub mod sphere;
