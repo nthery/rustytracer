@@ -15,6 +15,7 @@ struct SphereRep;
 #[derive(Clone, Debug)]
 pub struct Sphere {
     // Add a layer of indirection to implement identity.
+    // TODO: Store reference instead?
     rep: Rc<Box<SphereRep>>,
 }
 
