@@ -2,6 +2,8 @@
 //!
 //! See TRTC chapter 5.
 
+use std::cmp::Ordering;
+
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::tuple::{Tuple, ORIGIN};
@@ -14,6 +16,24 @@ pub struct Intersection {
 
     /// Distance from origin of intersecting ray.
     pub distance: f64,
+}
+
+/// Behavior associated with a sequence of `Intersection`.
+pub trait IntersectionList {
+    /// Returns intersection with the smallest non-negative distance.
+    fn hit(&self) -> Option<&Intersection>;
+}
+
+impl IntersectionList for Vec<Intersection> {
+    fn hit(&self) -> Option<&Intersection> {
+        self.iter().filter(|i| i.distance >= 0.0).min_by(|l, r| {
+            if l.distance < r.distance {
+                Ordering::Less
+            } else {
+                Ordering::Greater // or Ordering::Equal
+            }
+        })
+    }
 }
 
 /// Computes intersection between sphere and ray.
@@ -134,5 +154,83 @@ mod tests {
                 }
             ]
         );
+    }
+
+    #[test]
+    fn no_hit_when_no_intersections() {
+        let xs = Vec::<Intersection>::new();
+        assert_eq!(xs.hit(), None);
+    }
+
+    #[test]
+    fn hit_when_all_distances_are_positive() {
+        let s = Sphere::new();
+        let xs = vec![
+            Intersection {
+                sphere: s.clone(),
+                distance: 1.0,
+            },
+            Intersection {
+                sphere: s.clone(),
+                distance: 2.0,
+            },
+        ];
+        assert_eq!(*xs.hit().unwrap(), xs[0]);
+    }
+
+    #[test]
+    fn hit_when_some_distances_are_negative() {
+        let s = Sphere::new();
+        let xs = vec![
+            Intersection {
+                sphere: s.clone(),
+                distance: -1.0,
+            },
+            Intersection {
+                sphere: s.clone(),
+                distance: 1.0,
+            },
+        ];
+        assert_eq!(*xs.hit().unwrap(), xs[1]);
+    }
+
+    #[test]
+    fn hit_when_all_distances_are_negative() {
+        let s = Sphere::new();
+        let xs = vec![
+            Intersection {
+                sphere: s.clone(),
+                distance: -2.0,
+            },
+            Intersection {
+                sphere: s.clone(),
+                distance: -1.0,
+            },
+        ];
+        assert_eq!(xs.hit(), None);
+    }
+
+    #[test]
+    fn hit_is_lowest_nonnegative_distance() {
+        let s = Sphere::new();
+        let xs = vec![
+            Intersection {
+                sphere: s.clone(),
+                distance: 5.0,
+            },
+            Intersection {
+                sphere: s.clone(),
+                distance: 7.0,
+            },
+            Intersection {
+                sphere: s.clone(),
+                distance: -3.0,
+            },
+            Intersection {
+                sphere: s.clone(),
+                distance: 2.0,
+            },
+        ];
+        assert_eq!(*xs.hit().unwrap(), xs[3]);
     }
 }
