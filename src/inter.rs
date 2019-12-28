@@ -40,9 +40,10 @@ impl IntersectionList for Vec<Intersection<'_>> {
 /// Returns sequence of intersections.  If there is no intersection, the sequence is empty.  If the
 /// ray is tangent to the sphere, the sequence contains two identical intersections.
 pub fn intersects<'a>(sphere: &'a Sphere, ray: &Ray) -> Vec<Intersection<'a>> {
-    let sphere_to_ray = ray.origin() - &ORIGIN;
-    let a = Tuple::dot(ray.direction(), ray.direction());
-    let b = 2.0 * Tuple::dot(ray.direction(), &sphere_to_ray);
+    let trans_ray = ray.transformed(&sphere.transform.inverted());
+    let sphere_to_ray = trans_ray.origin() - &ORIGIN;
+    let a = Tuple::dot(trans_ray.direction(), trans_ray.direction());
+    let b = 2.0 * Tuple::dot(trans_ray.direction(), &sphere_to_ray);
     let c = Tuple::dot(&sphere_to_ray, &sphere_to_ray) - 1.0;
     let discriminant = b * b - 4.0 * a * c;
     if discriminant < 0.0 {
@@ -66,6 +67,8 @@ pub fn intersects<'a>(sphere: &'a Sphere, ray: &Ray) -> Vec<Intersection<'a>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use crate::transform;
 
     #[test]
     fn ray_intersects_sphere_at_two_points() {
@@ -231,5 +234,31 @@ mod tests {
             },
         ];
         assert_eq!(*xs.hit().unwrap(), xs[3]);
+    }
+
+    #[test]
+    fn intersecting_scaled_sphere_with_ray() {
+        let r = Ray::from_triplets((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
+        let s = Sphere::with_transform(transform::scaling(2.0, 2.0, 2.0));
+        assert_eq!(
+            intersects(&s, &r),
+            vec![
+                Intersection {
+                    sphere: &s,
+                    distance: 3.0,
+                },
+                Intersection {
+                    sphere: &s,
+                    distance: 7.0,
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn intersecting_translated_sphere_with_ray() {
+        let r = Ray::from_triplets((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
+        let s = Sphere::with_transform(transform::translation(5.0, 0.0, 0.0));
+        assert!(intersects(&s, &r).is_empty());
     }
 }

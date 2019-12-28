@@ -11,11 +11,16 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    /// Creates a new unique sphere.
+    /// Creates a new sphere with identity transformation.
     pub fn new() -> Sphere {
         Sphere {
             transform: Matrix::new_4x4_identity(),
         }
+    }
+
+    /// Creates a new sphere with the speficied transformation.
+    pub fn with_transform(t: Matrix) -> Sphere {
+        Sphere { transform: t }
     }
 }
 
@@ -28,6 +33,13 @@ mod tests {
     #[test]
     fn sphere_default_transformation_is_identity() {
         assert_eq!(Sphere::new().transform, Matrix::new_4x4_identity());
+    }
+
+    #[test]
+    fn creating_sphere_with_non_default_transformation() {
+        let t = transform::scaling(1.0, 2.0, 3.0);
+        let s = Sphere::with_transform(t.clone());
+        assert_eq!(s.transform, t);
     }
 
     #[test]
