@@ -2,9 +2,11 @@
 //!
 //! TRTC chapter 5.
 
+use crate::matrix::Matrix;
 use crate::tuple::Tuple;
 
 /// An immutable ray.
+#[derive(Debug, PartialEq)]
 pub struct Ray {
     origin: Tuple,
     direction: Tuple,
@@ -30,6 +32,7 @@ impl Ray {
     pub fn origin(&self) -> &Tuple {
         &self.origin
     }
+
     pub fn direction(&self) -> &Tuple {
         &self.direction
     }
@@ -38,11 +41,20 @@ impl Ray {
     pub fn position(&self, t: f64) -> Tuple {
         &self.origin + &(&self.direction * t)
     }
+
+    /// Apply transformation encoded in `m` to this ray and return resulting ray.
+    pub fn transformed(&self, m: &Matrix) -> Ray {
+        let o = m * &self.origin;
+        let d = m * &self.direction;
+        Ray::new(o, d)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use crate::transform;
 
     #[test]
     fn creating_ray_from_point_and_vector() {
@@ -71,5 +83,19 @@ mod tests {
         assert_eq!(r.position(1.0), Tuple::new_point(3.0, 3.0, 4.0));
         assert_eq!(r.position(-1.0), Tuple::new_point(1.0, 3.0, 4.0));
         assert_eq!(r.position(2.5), Tuple::new_point(4.5, 3.0, 4.0));
+    }
+
+    #[test]
+    fn translating_ray() {
+        let r = Ray::from_triplets((1.0, 2.0, 3.0), (0.0, 1.0, 0.0));
+        let tr = r.transformed(&transform::translation(3.0, 4.0, 5.0));
+        assert_eq!(tr, Ray::from_triplets((4.0, 6.0, 8.0), (0.0, 1.0, 0.0)));
+    }
+
+    #[test]
+    fn scaling_ray() {
+        let r = Ray::from_triplets((1.0, 2.0, 3.0), (0.0, 1.0, 0.0));
+        let tr = r.transformed(&transform::scaling(2.0, 3.0, 4.0));
+        assert_eq!(tr, Ray::from_triplets((2.0, 6.0, 12.0), (0.0, 3.0, 0.0)));
     }
 }
