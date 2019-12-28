@@ -4,9 +4,13 @@
 
 use std::rc::Rc;
 
+use crate::matrix::Matrix;
+
 /// Per-sphere data.
 #[derive(Debug)]
-struct SphereRep;
+struct SphereRep {
+    transform: Matrix,
+}
 
 /// A unit sphere centered on the origin.
 ///
@@ -23,8 +27,14 @@ impl Sphere {
     /// Creates a new unique sphere.
     pub fn new() -> Sphere {
         Sphere {
-            rep: Rc::new(Box::new(SphereRep)),
+            rep: Rc::new(Box::new(SphereRep {
+                transform: Matrix::new_4x4_identity(),
+            })),
         }
+    }
+
+    pub fn transform(&self) -> &Matrix {
+        &self.rep.transform
     }
 }
 
@@ -51,4 +61,20 @@ mod tests {
         let s = Sphere::new();
         assert_eq!(s.clone(), s.clone());
     }
+
+    #[test]
+    fn sphere_default_transformation_is_identity() {
+        assert_eq!(*Sphere::new().transform(), Matrix::new_4x4_identity());
+    }
+
+    /*
+     TODO: uncomment when Sphere refactored
+    #[test]
+    fn changing_sphere_transformation() {
+        let s = Sphere::new();
+        let t = transform::translation(2.0, 3.0, 4.0);
+        s.set_transform(t.clone());
+        assert_eq!(*s.transform(), t);
+    }
+    */
 }
