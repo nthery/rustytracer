@@ -7,10 +7,10 @@ use rustytracer::color;
 use rustytracer::inter::{self, IntersectionList};
 use rustytracer::ray::Ray;
 use rustytracer::sphere::Sphere;
+use rustytracer::transform;
 use rustytracer::tuple::Tuple;
 
-#[test]
-fn sphere_shadow() {
+fn render(sphere: &Sphere, filename: &str) {
     // Primitive constants.
     let ray_origin = Tuple::new_point(0.0, 0.0, -5.0);
     const WALL_Z: f64 = 10.0;
@@ -22,7 +22,6 @@ fn sphere_shadow() {
     const WALL_HALF_SIZE: f64 = WALL_SIZE / 2.0;
 
     let mut canvas = Canvas::new(CANVAS_PIXELS, CANVAS_PIXELS);
-    let sphere = Sphere::new();
 
     for y in 0..CANVAS_PIXELS {
         let world_y = WALL_HALF_SIZE - PIXEL_SIZE * y as f64;
@@ -37,6 +36,26 @@ fn sphere_shadow() {
         }
     }
 
-    let file = File::create("/tmp/sphere_shadow.ppm").unwrap();
+    let file = File::create(filename).unwrap();
     canvas.to_ppm(file).unwrap();
+}
+
+#[test]
+fn sphere_shadow() {
+    let sphere = Sphere::new();
+    render(&sphere, "/tmp/sphere_shadow.ppm");
+}
+
+#[test]
+fn y_shrunk_sphere_shadow() {
+    let sphere = Sphere::with_transform(transform::scaling(1.0, 0.5, 1.0));
+    render(&sphere, "/tmp/y_shrunk_sphere_shadow.ppm");
+}
+
+#[test]
+fn shrunk_and_sheared_sphere_shadow() {
+    let sphere = Sphere::with_transform(
+        &transform::shearing(1.0, 0.0, 0.0, 0.0, 0.0, 0.0) * &transform::scaling(0.5, 1.0, 1.0),
+    );
+    render(&sphere, "/tmp/shrunk_and_sheared_sphere_shadow.ppm");
 }
