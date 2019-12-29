@@ -14,6 +14,7 @@ pub const ORIGIN: Tuple = Tuple {
 
 /// A quadruplet that can represent a 3D point (w == 1.0) or vector (w == 0.0).
 /// TODO: introduce Vector and Point types?
+/// TODO: Use builtin tuples instead?
 #[derive(Clone, Debug)]
 pub struct Tuple {
     xyzw: [f64; 4],

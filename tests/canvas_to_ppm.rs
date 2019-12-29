@@ -15,6 +15,6 @@ fn canvas_to_ppm() {
         }
     }
 
-    let file = File::create("/tmp/rainbow.ppm").unwrap();
+    let file = File::create("/tmp/canvas_to_ppm.ppm").unwrap();
     c.to_ppm(file).unwrap();
 }

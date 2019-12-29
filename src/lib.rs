@@ -1,9 +1,10 @@
 //! Ray tracing library developed with
 //! TRTC book (https://pragprog.com/book/jbtracer/the-ray-tracer-challenge)
 //!
-//! TODO: Really need to overload operators for T and &T?
+//! TODO: Benchmark, profile and optimize primitives (avoid copies...)
 
 // TODO: public or crate internal?
+// TODO: re-export instead some entities?
 pub mod canvas;
 pub mod color;
 pub mod inter;
