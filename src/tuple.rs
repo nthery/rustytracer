@@ -102,7 +102,7 @@ impl Tuple {
         res.sqrt()
     }
 
-    pub fn normalize(&self) -> Tuple {
+    pub fn normalized(&self) -> Tuple {
         let m = self.magnitude();
         let mut res = (*self).clone();
         for i in 0..4 {
@@ -297,11 +297,11 @@ mod tests {
     #[test]
     fn normalizing_vector() {
         assert_eq!(
-            Tuple::new_vector(4.0, 0.0, 0.0).normalize(),
+            Tuple::new_vector(4.0, 0.0, 0.0).normalized(),
             Tuple::new_vector(1.0, 0.0, 0.0)
         );
         assert_eq!(
-            Tuple::new_vector(1.0, 2.0, 3.0).normalize(),
+            Tuple::new_vector(1.0, 2.0, 3.0).normalized(),
             Tuple::new_vector(0.26726, 0.53452, 0.80178)
         );
     }
@@ -309,7 +309,7 @@ mod tests {
     #[test]
     fn magnitude_of_normalized_vector_is_one() {
         assert_eq!(
-            Tuple::new_vector(1.0, 2.0, 3.0).normalize().magnitude(),
+            Tuple::new_vector(1.0, 2.0, 3.0).normalized().magnitude(),
             1.0
         );
     }

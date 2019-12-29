@@ -29,7 +29,7 @@ fn sphere_shadow() {
         for x in 0..CANVAS_PIXELS {
             let world_x = -WALL_HALF_SIZE + PIXEL_SIZE * x as f64;
             let pos = Tuple::new_point(world_x, world_y, WALL_Z);
-            let ray = Ray::new(ray_origin.clone(), (&pos - &ray_origin).normalize());
+            let ray = Ray::new(ray_origin.clone(), (&pos - &ray_origin).normalized());
             let xs = inter::intersects(&sphere, &ray);
             if xs.hit() != None {
                 canvas.set(x, y, &color::RED);
