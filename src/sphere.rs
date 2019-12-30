@@ -22,7 +22,7 @@ impl Sphere {
         }
     }
 
-    /// Creates a new sphere with the speficied transformation.
+    /// Creates a new sphere with the specified transformation.
     pub fn with_transform(t: Matrix) -> Sphere {
         Sphere {
             transform: t,
