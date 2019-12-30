@@ -6,6 +6,7 @@ use crate::color::{self, Color};
 use crate::tuple::Tuple;
 
 /// A sizeless light source.
+#[derive(Debug, PartialEq)]
 pub struct PointLight {
     pub intensity: Color,
     pub position: Tuple,
@@ -22,6 +23,7 @@ impl PointLight {
 }
 
 /// Phong reflection model parameters.
+#[derive(Debug, PartialEq)]
 pub struct Material {
     pub color: Color,
     pub ambient: f64,

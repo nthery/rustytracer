@@ -2,6 +2,7 @@
 //!
 //! TRTC chapter 5.
 
+use crate::light::Material;
 use crate::matrix::Matrix;
 use crate::tuple::{Tuple, ORIGIN};
 
@@ -9,6 +10,7 @@ use crate::tuple::{Tuple, ORIGIN};
 #[derive(PartialEq, Debug)]
 pub struct Sphere {
     pub transform: Matrix,
+    pub material: Material,
 }
 
 impl Sphere {
@@ -16,12 +18,16 @@ impl Sphere {
     pub fn new() -> Sphere {
         Sphere {
             transform: Matrix::new_4x4_identity(),
+            material: Material::default(),
         }
     }
 
     /// Creates a new sphere with the speficied transformation.
     pub fn with_transform(t: Matrix) -> Sphere {
-        Sphere { transform: t }
+        Sphere {
+            transform: t,
+            material: Material::default(),
+        }
     }
 
     /// Computes normal vector on this sphere at point `p` in world space.
