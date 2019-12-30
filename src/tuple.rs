@@ -110,6 +110,13 @@ impl Tuple {
         }
         res
     }
+
+    /// Returns reflexion of this vector along the given `normal` vector.
+    pub fn reflected(&self, normal: &Tuple) -> Tuple {
+        debug_assert!(self.is_vector());
+        debug_assert!(normal.is_vector());
+        self - &(normal * (2.0 * Tuple::dot(self, normal)))
+    }
 }
 
 impl PartialEq for Tuple {
@@ -331,5 +338,19 @@ mod tests {
         let r = Tuple::new_vector(2.0, 3.0, 4.0);
         assert_eq!(Tuple::cross(&l, &r), Tuple::new_vector(-1.0, 2.0, -1.0));
         assert_eq!(Tuple::cross(&r, &l), Tuple::new_vector(1.0, -2.0, 1.0));
+    }
+
+    #[test]
+    fn reflecting_vector_approaching_at_45() {
+        let v = Tuple::new_vector(1.0, -1.0, 0.0);
+        let n = Tuple::new_vector(0.0, 1.0, 0.0);
+        assert_eq!(v.reflected(&n), Tuple::new_vector(1.0, 1.0, 0.0));
+    }
+
+    #[test]
+    fn reflecting_vector_off_slanted_surface() {
+        let v = Tuple::new_vector(0.0, -1.0, 0.0);
+        let n = Tuple::new_vector(2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0, 0.0);
+        assert_eq!(v.reflected(&n), Tuple::new_vector(1.0, 0.0, 0.0));
     }
 }
