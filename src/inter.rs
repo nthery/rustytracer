@@ -73,7 +73,7 @@ mod tests {
     #[test]
     fn ray_intersects_sphere_at_two_points() {
         let r = Ray::from_triplets((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = intersects(&s, &r);
         assert_eq!(
             xs,
@@ -93,7 +93,7 @@ mod tests {
     #[test]
     fn ray_intersects_sphere_at_tangent() {
         let r = Ray::from_triplets((0.0, 1.0, -5.0), (0.0, 0.0, 1.0));
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = intersects(&s, &r);
         assert_eq!(
             xs,
@@ -113,7 +113,7 @@ mod tests {
     #[test]
     fn ray_misses_sphere() {
         let r = Ray::from_triplets((0.0, 2.0, -5.0), (0.0, 0.0, 1.0));
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = intersects(&s, &r);
         assert_eq!(xs, []);
     }
@@ -121,7 +121,7 @@ mod tests {
     #[test]
     fn ray_originates_inside_sphere() {
         let r = Ray::from_triplets((0.0, 0.0, 0.0), (0.0, 0.0, 1.0));
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = intersects(&s, &r);
         assert_eq!(
             xs,
@@ -141,7 +141,7 @@ mod tests {
     #[test]
     fn sphere_is_behind_ray() {
         let r = Ray::from_triplets((0.0, 0.0, 5.0), (0.0, 0.0, 1.0));
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = intersects(&s, &r);
         assert_eq!(
             xs,
@@ -166,7 +166,7 @@ mod tests {
 
     #[test]
     fn hit_when_all_distances_are_positive() {
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = vec![
             Intersection {
                 sphere: &s,
@@ -182,7 +182,7 @@ mod tests {
 
     #[test]
     fn hit_when_some_distances_are_negative() {
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = vec![
             Intersection {
                 sphere: &s,
@@ -198,7 +198,7 @@ mod tests {
 
     #[test]
     fn hit_when_all_distances_are_negative() {
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = vec![
             Intersection {
                 sphere: &s,
@@ -214,7 +214,7 @@ mod tests {
 
     #[test]
     fn hit_is_lowest_nonnegative_distance() {
-        let s = Sphere::new();
+        let s = Sphere::default();
         let xs = vec![
             Intersection {
                 sphere: &s,

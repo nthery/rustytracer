@@ -13,15 +13,17 @@ pub struct Sphere {
     pub material: Material,
 }
 
-impl Sphere {
+impl Default for Sphere {
     /// Creates a new sphere with identity transformation.
-    pub fn new() -> Sphere {
+    fn default() -> Self {
         Sphere {
             transform: Matrix::new_4x4_identity(),
             material: Material::default(),
         }
     }
+}
 
+impl Sphere {
     /// Creates a new sphere with the specified transformation.
     pub fn with_transform(t: Matrix) -> Sphere {
         Sphere {
@@ -51,7 +53,7 @@ mod tests {
 
     #[test]
     fn sphere_default_transformation_is_identity() {
-        assert_eq!(Sphere::new().transform, Matrix::new_4x4_identity());
+        assert_eq!(Sphere::default().transform, Matrix::new_4x4_identity());
     }
 
     #[test]
@@ -63,7 +65,7 @@ mod tests {
 
     #[test]
     fn changing_sphere_transformation() {
-        let mut s = Sphere::new();
+        let mut s = Sphere::default();
         let t = transform::translation(2.0, 3.0, 4.0);
         s.transform = t.clone();
         assert_eq!(s.transform, t);
@@ -72,7 +74,7 @@ mod tests {
     #[test]
     fn normal_at_point_on_x_axis() {
         assert_eq!(
-            Sphere::new().normal_at(&Tuple::new_point(1.0, 0.0, 0.0)),
+            Sphere::default().normal_at(&Tuple::new_point(1.0, 0.0, 0.0)),
             Tuple::new_vector(1.0, 0.0, 0.0)
         );
     }
@@ -80,7 +82,7 @@ mod tests {
     #[test]
     fn normal_at_point_on_y_axis() {
         assert_eq!(
-            Sphere::new().normal_at(&Tuple::new_point(0.0, 1.0, 0.0)),
+            Sphere::default().normal_at(&Tuple::new_point(0.0, 1.0, 0.0)),
             Tuple::new_vector(0.0, 1.0, 0.0)
         );
     }
@@ -88,7 +90,7 @@ mod tests {
     #[test]
     fn normal_at_point_on_z_axis() {
         assert_eq!(
-            Sphere::new().normal_at(&Tuple::new_point(0.0, 0.0, 1.0)),
+            Sphere::default().normal_at(&Tuple::new_point(0.0, 0.0, 1.0)),
             Tuple::new_vector(0.0, 0.0, 1.0)
         );
     }
@@ -97,7 +99,7 @@ mod tests {
     fn normal_at_non_axial_point() {
         let z = 3_f64.sqrt() / 3.0;
         assert_eq!(
-            Sphere::new().normal_at(&Tuple::new_point(z, z, z)),
+            Sphere::default().normal_at(&Tuple::new_point(z, z, z)),
             Tuple::new_vector(z, z, z)
         );
     }
@@ -105,7 +107,7 @@ mod tests {
     #[test]
     fn normal_is_normalized() {
         let z = 3_f64.sqrt() / 3.0;
-        let n = Sphere::new().normal_at(&Tuple::new_point(z, z, z));
+        let n = Sphere::default().normal_at(&Tuple::new_point(z, z, z));
         assert_eq!(n, n.normalized());
     }
 

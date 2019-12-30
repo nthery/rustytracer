@@ -42,7 +42,7 @@ fn render(sphere: &Sphere, filename: &str) {
 
 #[test]
 fn sphere_shadow() {
-    let sphere = Sphere::new();
+    let sphere = Sphere::default();
     render(&sphere, "/tmp/sphere_shadow.ppm");
 }
 
