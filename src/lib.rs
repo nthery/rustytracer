@@ -14,5 +14,6 @@ pub mod ray;
 pub mod sphere;
 pub mod transform;
 pub mod tuple;
+pub mod world;
 
 mod util;
