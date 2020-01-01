@@ -11,10 +11,58 @@ use crate::tuple::{Tuple, ORIGIN};
 /// Intersection between an object and a `Ray`.
 #[derive(PartialEq, Debug)]
 pub struct Intersection<'a> {
+    /// Object being intersected.
     pub sphere: &'a Sphere,
 
     /// Distance from origin of intersecting ray.
     pub distance: f64,
+}
+
+impl Intersection<'_> {
+    /// Precomputes data used to compute lighting and shading.
+    ///
+    /// `ray` is cast from the eye to this intersection point.
+    pub fn prepare_computations(&self, ray: &Ray) -> Computations {
+        debug_assert!(ray.direction().is_vector());
+        let point = ray.position(self.distance);
+        let mut normal_vec = self.sphere.normal_at(&point);
+        let eye_vec = -ray.direction();
+        let mut inside = false;
+        if Tuple::dot(&normal_vec, &eye_vec) < 0.0 {
+            inside = true;
+            normal_vec = -&normal_vec;
+        }
+        Computations {
+            distance: self.distance,
+            object: self.sphere,
+            normal_vec,
+            point,
+            eye_vec,
+            inside,
+        }
+    }
+}
+
+/// Additional data about an `Intersection` used to compute lighting and shading.
+#[derive(PartialEq, Debug)]
+pub struct Computations<'a> {
+    /// `Intersection::distance` copy.
+    pub distance: f64,
+
+    /// `Intersection::sphere` copy.
+    pub object: &'a Sphere,
+
+    /// Intersection point.
+    pub point: Tuple,
+
+    /// Vector from intersection point to eye.
+    pub eye_vec: Tuple,
+
+    /// Surface normal vector at intersection point.
+    pub normal_vec: Tuple,
+
+    /// The intersection is inside `object`.
+    pub inside: bool,
 }
 
 /// Behavior associated with a sequence of `Intersection`.
@@ -260,5 +308,47 @@ mod tests {
         let r = Ray::from_triplets((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
         let s = Sphere::with_transform(transform::translation(5.0, 0.0, 0.0));
         assert!(intersects(&s, &r).is_empty());
+    }
+
+    #[test]
+    fn precomputing_intersection_state() {
+        let r = Ray::from_triplets((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
+        let s = Sphere::default();
+        let i = Intersection {
+            distance: 4.0,
+            sphere: &s,
+        };
+        assert_eq!(
+            i.prepare_computations(&r),
+            Computations {
+                distance: 4.0,
+                object: &s,
+                point: Tuple::new_point(0.0, 0.0, -1.0),
+                eye_vec: Tuple::new_vector(0.0, 0.0, -1.0),
+                normal_vec: Tuple::new_vector(0.0, 0.0, -1.0),
+                inside: false,
+            }
+        );
+    }
+
+    #[test]
+    fn precomputing_when_intersection_is_inside_object() {
+        let r = Ray::from_triplets((0.0, 0.0, 0.0), (0.0, 0.0, 1.0));
+        let s = Sphere::default();
+        let i = Intersection {
+            distance: 1.0,
+            sphere: &s,
+        };
+        assert_eq!(
+            i.prepare_computations(&r),
+            Computations {
+                distance: 1.0,
+                object: &s,
+                point: Tuple::new_point(0.0, 0.0, 1.0),
+                eye_vec: Tuple::new_vector(0.0, 0.0, -1.0),
+                normal_vec: Tuple::new_vector(0.0, 0.0, -1.0),
+                inside: true,
+            }
+        );
     }
 }
