@@ -16,7 +16,7 @@ impl World {
     /// Computes color of intersection between an object of this world and `ray`.
     pub fn color_at(&self, ray: &Ray) -> Color {
         let xs = self.intersects(ray);
-        if xs.len() == 0 {
+        if xs.is_empty() {
             color::BLACK
         } else {
             self.shade_hit(&xs[0].prepare_computations(ray))
