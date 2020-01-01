@@ -193,7 +193,7 @@ impl std::ops::Mul for &Matrix {
     /// TODO: naive algorithm
     fn mul(self, o: Self) -> Self::Output {
         assert_eq!(self.nrows, o.ncols);
-        let mut res = Matrix::new(o.ncols, self.nrows);
+        let mut res = Matrix::new(self.nrows, o.ncols);
         for r in 0..self.nrows {
             for c in 0..self.ncols {
                 let mut dot = 0.0;
