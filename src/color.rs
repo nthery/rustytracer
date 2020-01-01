@@ -2,6 +2,8 @@
 //!
 //! TRTC chapter 2
 
+use crate::util;
+
 #[derive(Debug, Clone)]
 pub struct Color {
     rgb: [f64; 3],
@@ -31,7 +33,9 @@ impl Color {
 
 impl PartialEq for Color {
     fn eq(&self, o: &Self) -> bool {
-        self.rgb == o.rgb
+        util::nearly_equal(self.rgb[0], o.rgb[0])
+            && util::nearly_equal(self.rgb[1], o.rgb[1])
+            && util::nearly_equal(self.rgb[2], o.rgb[2])
     }
 }
 
