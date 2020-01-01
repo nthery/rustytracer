@@ -6,6 +6,7 @@
 //! TODO: Is it possible to implement expression templates?
 
 use crate::matrix::Matrix;
+use crate::tuple::Tuple;
 
 /// Returns a matrix that encodes the given translation.
 pub fn translation(dx: f64, dy: f64, dz: f64) -> Matrix {
@@ -67,10 +68,29 @@ pub fn shearing(xy: f64, xz: f64, yx: f64, yz: f64, zx: f64, zy: f64) -> Matrix 
     res
 }
 
+/// Returns a transformation matrix for an eye at point `from` looking toward point `to` with
+/// the `up` vector pointing upward.
+pub fn view(from: &Tuple, to: &Tuple, up: &Tuple) -> Matrix {
+    debug_assert!(from.is_point());
+    debug_assert!(to.is_point());
+    debug_assert!(up.is_vector());
+
+    let fwd = (to - from).normalized();
+    let left = Tuple::cross(&fwd, &up.normalized());
+    let true_up = Tuple::cross(&left, &fwd);
+    let orientation = Matrix::new_4x4(&[
+        [left.x(), left.y(), left.z(), 0.0],
+        [true_up.x(), true_up.y(), true_up.z(), 0.0],
+        [-fwd.x(), -fwd.y(), -fwd.z(), 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]);
+    &orientation * &translation(-from.x(), -from.y(), -from.z())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tuple::Tuple;
+    use crate::tuple::ORIGIN;
     use std::f64::consts::PI;
 
     #[test]
@@ -250,5 +270,58 @@ mod tests {
 
         let t = &(&trans * &scal) * &rot;
         assert_eq!(&t * &p, Tuple::new_point(15.0, 0.0, 7.0));
+    }
+
+    #[test]
+    fn default_view_transformation() {
+        assert_eq!(
+            view(
+                &ORIGIN,
+                &Tuple::new_point(0.0, 0.0, -1.0),
+                &Tuple::new_vector(0.0, 1.0, 0.0)
+            ),
+            Matrix::new_4x4_identity()
+        );
+    }
+
+    #[test]
+    fn view_transformation_looking_in_positive_z_direction() {
+        assert_eq!(
+            view(
+                &ORIGIN,
+                &Tuple::new_point(0.0, 0.0, 1.0),
+                &Tuple::new_vector(0.0, 1.0, 0.0)
+            ),
+            scaling(-1.0, 1.0, -1.0)
+        );
+    }
+
+    #[test]
+    fn view_transformation_moves_world() {
+        assert_eq!(
+            view(
+                &Tuple::new_point(0.0, 0.0, 8.0),
+                &ORIGIN,
+                &Tuple::new_vector(0.0, 1.0, 0.0)
+            ),
+            translation(0.0, 0.0, -8.0)
+        );
+    }
+
+    #[test]
+    fn arbitrary_view_transformation() {
+        assert_eq!(
+            view(
+                &Tuple::new_point(1.0, 3.0, 2.0),
+                &Tuple::new_point(4.0, -2.0, 8.0),
+                &Tuple::new_vector(1.0, 1.0, 0.0)
+            ),
+            Matrix::new_4x4(&[
+                [-0.50709, 0.50709, 0.67612, -2.36643],
+                [0.76772, 0.60609, 0.12122, -2.82843],
+                [-0.35857, 0.59761, -0.71714, 0.00000],
+                [0.00000, 0.00000, 0.00000, 1.00000]
+            ])
+        );
     }
 }
