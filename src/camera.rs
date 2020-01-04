@@ -2,9 +2,11 @@
 //!
 //! See TRTC chapter 7.
 
+use crate::canvas::Canvas;
 use crate::matrix::Matrix;
 use crate::ray::Ray;
 use crate::tuple::{Tuple, ORIGIN};
+use crate::world::World;
 
 /// Parameters to map the 3D world to a 2D canvas.
 pub struct Camera {
@@ -79,8 +81,22 @@ impl Camera {
         self.pixel_size
     }
 
+    /// Render the view of the `world` as seen by this camera.
+    pub fn render(&self, world: &World) -> Canvas {
+        let mut canvas = Canvas::new(self.hsize, self.vsize);
+
+        for y in 0..self.vsize {
+            for x in 0..self.hsize {
+                let ray = self.ray_for_pixel(x, y);
+                canvas.set(x, y, &world.color_at(&ray));
+            }
+        }
+
+        canvas
+    }
+
     /// Computes a ray cast from the camera to `(x,y)` on canvas.
-    pub fn ray_for_pixel(&self, x: usize, y: usize) -> Ray {
+    fn ray_for_pixel(&self, x: usize, y: usize) -> Ray {
         // Compute point offsets from canvas top-left in world units.
         let x_off = (x as f64 + 0.5) * self.pixel_size;
         let y_off = (y as f64 + 0.5) * self.pixel_size;
@@ -102,10 +118,13 @@ impl Camera {
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::PI;
+
     use super::*;
+    use crate::color::Color;
     use crate::transform;
     use crate::util;
-    use std::f64::consts::PI;
+    use crate::world::test_util;
 
     #[test]
     fn constructing_camera() {
@@ -157,5 +176,22 @@ mod tests {
                 (2_f64.sqrt() / 2.0, 0.0, -2_f64.sqrt() / 2.0)
             )
         );
+    }
+
+    #[test]
+    fn rendering_world_with_camera() {
+        let w = test_util::default_world();
+        let c = Camera::with_transform(
+            11,
+            11,
+            PI / 2.0,
+            transform::view(
+                &Tuple::new_point(0.0, 0.0, -5.0),
+                &ORIGIN,
+                &Tuple::new_vector(0.0, 1.0, 0.0),
+            ),
+        );
+        let img = c.render(&w);
+        assert_eq!(*img.get(5, 5), Color::new(0.38066, 0.47583, 0.2855));
     }
 }
