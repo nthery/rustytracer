@@ -5,6 +5,7 @@
 
 // TODO: public or crate internal?
 // TODO: re-export instead some entities?
+pub mod camera;
 pub mod canvas;
 pub mod color;
 pub mod inter;
