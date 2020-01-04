@@ -33,6 +33,17 @@ impl Camera {
     /// Constructs a new camera for canvas `(hsize, vsize)`, `field_of_view` angle and
     /// an identity view transformation.
     pub fn new(hsize: usize, vsize: usize, field_of_view: f64) -> Camera {
+        Self::with_transform(hsize, vsize, field_of_view, Matrix::new_4x4_identity())
+    }
+
+    /// Constructs a new camera for canvas `(hsize, vsize)`, `field_of_view` angle and
+    /// `transform` view transformation.
+    pub fn with_transform(
+        hsize: usize,
+        vsize: usize,
+        field_of_view: f64,
+        transform: Matrix,
+    ) -> Camera {
         let half_view = (field_of_view / 2.0).tan();
         let aspect = hsize as f64 / vsize as f64;
         let (half_width, half_height) = if aspect >= 1.0 {
@@ -45,7 +56,7 @@ impl Camera {
             hsize,
             vsize,
             field_of_view,
-            transform: Matrix::new_4x4_identity(),
+            transform,
             half_width,
             half_height,
             pixel_size,
