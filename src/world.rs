@@ -47,14 +47,13 @@ impl World {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod test_util {
     use super::*;
-
     use crate::light::Material;
     use crate::transform;
     use crate::tuple::Tuple;
 
-    fn default_world() -> World {
+    pub fn default_world() -> World {
         World {
             light: PointLight::new(color::WHITE, Tuple::new_point(-10.0, 10.0, -10.0)),
             objects: vec![
@@ -74,10 +73,18 @@ mod tests {
             ],
         }
     }
+}
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use super::*;
+
+    use super::test_util;
+    use crate::tuple::Tuple;
 
     #[test]
     fn intersect_world_with_ray() {
-        let w = default_world();
+        let w = test_util::default_world();
         let r = Ray::new(
             Tuple::new_point(0.0, 0.0, -5.0),
             Tuple::new_vector(0.0, 0.0, 1.0),
@@ -107,7 +114,7 @@ mod tests {
 
     #[test]
     fn shading_intersection() {
-        let w = default_world();
+        let w = test_util::default_world();
         let r = Ray::new(
             Tuple::new_point(0.0, 0.0, -5.0),
             Tuple::new_vector(0.0, 0.0, 1.0),
@@ -125,7 +132,7 @@ mod tests {
 
     #[test]
     fn shading_intersection_from_inside() {
-        let mut w = default_world();
+        let mut w = test_util::default_world();
         w.light = PointLight::new(color::WHITE, Tuple::new_point(0.0, 0.25, 0.0));
         let r = Ray::new(
             Tuple::new_point(0.0, 0.0, 0.0),
@@ -144,7 +151,7 @@ mod tests {
 
     #[test]
     fn color_when_ray_misses() {
-        let w = default_world();
+        let w = test_util::default_world();
         let r = Ray::new(
             Tuple::new_point(0.0, 0.0, -5.0),
             Tuple::new_vector(0.0, 1.0, 0.0),
@@ -154,7 +161,7 @@ mod tests {
 
     #[test]
     fn color_when_ray_hits() {
-        let w = default_world();
+        let w = test_util::default_world();
         let r = Ray::new(
             Tuple::new_point(0.0, 0.0, -5.0),
             Tuple::new_vector(0.0, 0.0, 1.0),
@@ -164,7 +171,7 @@ mod tests {
 
     #[test]
     fn color_with_intersection_behind_ray() {
-        let mut w = default_world();
+        let mut w = test_util::default_world();
         for o in &mut w.objects {
             o.material.ambient = 1.0;
         }
