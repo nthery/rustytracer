@@ -23,7 +23,7 @@ impl PointLight {
 }
 
 /// Phong reflection model parameters.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Material {
     pub color: Color,
     pub ambient: f64,
