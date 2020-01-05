@@ -32,6 +32,14 @@ impl Sphere {
         }
     }
 
+    /// Creates a new sphere with the specified transformation and material.
+    pub fn with_transform_and_material(transform: Matrix, material: Material) -> Sphere {
+        Sphere {
+            transform,
+            material,
+        }
+    }
+
     /// Computes normal vector on this sphere at point `p` in world space.
     pub fn normal_at(&self, world_pt: &Tuple) -> Tuple {
         debug_assert!(world_pt.is_point());
