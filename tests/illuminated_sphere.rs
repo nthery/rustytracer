@@ -5,7 +5,7 @@ use std::fs::File;
 use rustytracer::canvas::Canvas;
 use rustytracer::color::{self, Color};
 use rustytracer::inter::{self, IntersectionList};
-use rustytracer::light::{self, PointLight};
+use rustytracer::light::{self, PointLight, PointStatus};
 use rustytracer::ray::Ray;
 use rustytracer::sphere::Sphere;
 use rustytracer::tuple::Tuple;
@@ -44,6 +44,7 @@ fn illuminated_sphere() {
                     &sphere_pt,
                     &-ray.direction(),
                     &hit.sphere.normal_at(&sphere_pt),
+                    PointStatus::InLight,
                 );
                 canvas.set(x, y, &c);
             }

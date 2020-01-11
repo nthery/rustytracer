@@ -2,7 +2,7 @@
 
 use crate::color::{self, Color};
 use crate::inter::{self, Computations, Intersection};
-use crate::light::{self, PointLight};
+use crate::light::{self, PointLight, PointStatus};
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 
@@ -42,6 +42,7 @@ impl World {
             &comps.point,
             &comps.eye_vec,
             &comps.normal_vec,
+            PointStatus::InLight, // XXX
         )
     }
 }
