@@ -1,10 +1,11 @@
 //! World type
 
 use crate::color::{self, Color};
-use crate::inter::{self, Computations, Intersection};
+use crate::inter::{self, Computations, Intersection, IntersectionList};
 use crate::light::{self, PointLight, PointStatus};
 use crate::ray::Ray;
 use crate::sphere::Sphere;
+use crate::tuple::Tuple;
 
 /// A scene to render.
 pub struct World {
@@ -44,6 +45,23 @@ impl World {
             &comps.normal_vec,
             PointStatus::InLight, // XXX
         )
+    }
+
+    /// Returns whether point `pt` is in shadow.
+    fn point_status(&self, pt: &Tuple) -> PointStatus {
+        debug_assert!(pt.is_point());
+        let vec = &self.light.position - pt;
+        let ray = Ray::new(pt.clone(), vec.normalized());
+        let xs = self.intersects(&ray);
+        if let Some(i) = xs.hit() {
+            if i.distance < vec.magnitude() {
+                PointStatus::InShadow
+            } else {
+                PointStatus::InLight
+            }
+        } else {
+            PointStatus::InLight
+        }
     }
 }
 
@@ -182,5 +200,33 @@ mod tests {
         );
         // Intersection is on inner object.
         assert_eq!(w.color_at(&r), w.objects[0].material.color);
+    }
+
+    #[test]
+    fn no_shadow_when_nothing_colinear_with_point_and_light() {
+        let w = test_util::default_world();
+        let p = Tuple::new_point(0.0, 10.0, 0.0);
+        assert_eq!(w.point_status(&p), PointStatus::InLight);
+    }
+
+    #[test]
+    fn shadow_when_object_between_point_and_light() {
+        let w = test_util::default_world();
+        let p = Tuple::new_point(10.0, -10.0, 10.0);
+        assert_eq!(w.point_status(&p), PointStatus::InShadow);
+    }
+
+    #[test]
+    fn no_shadow_when_object_behind_light() {
+        let w = test_util::default_world();
+        let p = Tuple::new_point(-20.0, 20.0, -20.0);
+        assert_eq!(w.point_status(&p), PointStatus::InLight);
+    }
+
+    #[test]
+    fn no_shadow_when_object_behind_point() {
+        let w = test_util::default_world();
+        let p = Tuple::new_point(-2.0, 2.0, -2.0);
+        assert_eq!(w.point_status(&p), PointStatus::InLight);
     }
 }
