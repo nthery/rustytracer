@@ -40,10 +40,10 @@ impl World {
         light::lighting(
             &comps.object.material,
             &self.light,
-            &comps.point,
+            &comps.over_point,
             &comps.eye_vec,
             &comps.normal_vec,
-            PointStatus::InLight, // XXX
+            self.point_status(&comps.over_point),
         )
     }
 
@@ -99,6 +99,7 @@ mod tests {
     use super::*;
 
     use super::test_util;
+    use crate::transform;
     use crate::tuple::Tuple;
 
     #[test]
@@ -166,6 +167,35 @@ mod tests {
             w.shade_hit(&i.prepare_computations(&r)),
             Color::new(0.90498, 0.90498, 0.90498)
         )
+    }
+
+    #[test]
+    fn shade_hit_given_intersection_in_shadow() {
+        let w = World {
+            light: PointLight::new(color::WHITE, Tuple::new_point(0.0, 0.0, -10.0)),
+            objects: vec![
+                Sphere::default(),
+                Sphere {
+                    transform: transform::translation(0.0, 0.0, 10.0),
+                    ..Sphere::default()
+                },
+            ],
+        };
+
+        let r = Ray::new(
+            Tuple::new_point(0.0, 0.0, 5.0),
+            Tuple::new_vector(0.0, 0.0, 1.0),
+        );
+
+        let i = Intersection {
+            distance: 4.0,
+            sphere: &w.objects[1],
+        };
+
+        assert_eq!(
+            w.shade_hit(&i.prepare_computations(&r)),
+            Color::new(0.1, 0.1, 0.1)
+        );
     }
 
     #[test]
