@@ -7,6 +7,7 @@ use std::cmp::Ordering;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::tuple::{Tuple, ORIGIN};
+use crate::util;
 
 /// Intersection between an object and a `Ray`.
 #[derive(PartialEq, Debug)]
@@ -32,11 +33,13 @@ impl Intersection<'_> {
             inside = true;
             normal_vec = -&normal_vec;
         }
+        let over_point = &point + &(&normal_vec * util::EPSILON);
         Computations {
             distance: self.distance,
             object: self.sphere,
             normal_vec,
             point,
+            over_point,
             eye_vec,
             inside,
         }
@@ -54,6 +57,9 @@ pub struct Computations<'a> {
 
     /// Intersection point.
     pub point: Tuple,
+
+    /// Point slightly over intersection point.
+    pub over_point: Tuple,
 
     /// Vector from intersection point to eye.
     pub eye_vec: Tuple,
@@ -324,6 +330,7 @@ mod tests {
                 distance: 4.0,
                 object: &s,
                 point: Tuple::new_point(0.0, 0.0, -1.0),
+                over_point: Tuple::new_point(0.0, 0.0, -1.00001),
                 eye_vec: Tuple::new_vector(0.0, 0.0, -1.0),
                 normal_vec: Tuple::new_vector(0.0, 0.0, -1.0),
                 inside: false,
@@ -345,10 +352,27 @@ mod tests {
                 distance: 1.0,
                 object: &s,
                 point: Tuple::new_point(0.0, 0.0, 1.0),
+                over_point: Tuple::new_point(0.0, 0.0, 0.99999),
                 eye_vec: Tuple::new_vector(0.0, 0.0, -1.0),
                 normal_vec: Tuple::new_vector(0.0, 0.0, -1.0),
                 inside: true,
             }
         );
+    }
+
+    #[test]
+    fn hit_should_offset_point() {
+        let r = Ray::from_triplets((0.0, 0.0, -5.0), (0.0, 0.0, 1.0));
+        let s = Sphere {
+            transform: transform::translation(0.0, 0.0, 1.0),
+            ..Sphere::default()
+        };
+        let i = Intersection {
+            distance: 5.0,
+            sphere: &s,
+        };
+        let comps = i.prepare_computations(&r);
+        assert!(comps.over_point.z() < -util::EPSILON / 2.0);
+        assert!(comps.point.z() > comps.over_point.z());
     }
 }
