@@ -4,13 +4,12 @@ use std::fs::File;
 
 use rustytracer::canvas::Canvas;
 use rustytracer::color;
-use rustytracer::inter::{self, IntersectionList};
 use rustytracer::ray::Ray;
-use rustytracer::sphere::Sphere;
+use rustytracer::shape::{IntersectionList, Object, Shape};
 use rustytracer::transform;
 use rustytracer::tuple::Tuple;
 
-fn render(sphere: &Sphere, filename: &str) {
+fn render(sphere: &Shape, filename: &str) {
     // Primitive constants.
     let ray_origin = Tuple::new_point(0.0, 0.0, -5.0);
     const WALL_Z: f64 = 10.0;
@@ -29,7 +28,7 @@ fn render(sphere: &Sphere, filename: &str) {
             let world_x = -WALL_HALF_SIZE + PIXEL_SIZE * x as f64;
             let pos = Tuple::new_point(world_x, world_y, WALL_Z);
             let ray = Ray::new(ray_origin.clone(), (&pos - &ray_origin).normalized());
-            let xs = inter::intersects(&sphere, &ray);
+            let xs = sphere.intersections(&ray);
             if xs.hit() != None {
                 canvas.set(x, y, &color::RED);
             }
@@ -42,19 +41,20 @@ fn render(sphere: &Sphere, filename: &str) {
 
 #[test]
 fn sphere_shadow() {
-    let sphere = Sphere::default();
+    let sphere = Shape::new(Object::Sphere);
     render(&sphere, "/tmp/sphere_shadow.ppm");
 }
 
 #[test]
 fn y_shrunk_sphere_shadow() {
-    let sphere = Sphere::with_transform(transform::scaling(1.0, 0.5, 1.0));
+    let sphere = Shape::with_transform(Object::Sphere, transform::scaling(1.0, 0.5, 1.0));
     render(&sphere, "/tmp/y_shrunk_sphere_shadow.ppm");
 }
 
 #[test]
 fn shrunk_and_sheared_sphere_shadow() {
-    let sphere = Sphere::with_transform(
+    let sphere = Shape::with_transform(
+        Object::Sphere,
         &transform::shearing(1.0, 0.0, 0.0, 0.0, 0.0, 0.0) * &transform::scaling(0.5, 1.0, 1.0),
     );
     render(&sphere, "/tmp/shrunk_and_sheared_sphere_shadow.ppm");

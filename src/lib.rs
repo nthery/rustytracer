@@ -8,11 +8,10 @@
 pub mod camera;
 pub mod canvas;
 pub mod color;
-pub mod inter;
 pub mod light;
 pub mod matrix;
 pub mod ray;
-pub mod sphere;
+pub mod shape;
 pub mod transform;
 pub mod tuple;
 pub mod world;

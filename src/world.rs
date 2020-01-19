@@ -1,16 +1,15 @@
 //! World type
 
 use crate::color::{self, Color};
-use crate::inter::{self, Computations, Intersection, IntersectionList};
 use crate::light::{self, PointLight, PointStatus};
 use crate::ray::Ray;
-use crate::sphere::Sphere;
+use crate::shape::{Computations, Intersection, IntersectionList, Shape};
 use crate::tuple::Tuple;
 
 /// A scene to render.
 pub struct World {
     pub light: PointLight,
-    pub objects: Vec<Sphere>,
+    pub objects: Vec<Shape>,
 }
 
 impl World {
@@ -29,7 +28,7 @@ impl World {
         let mut xs: Vec<Intersection> = self
             .objects
             .iter()
-            .flat_map(|o| inter::intersects(o, ray))
+            .flat_map(|o| o.intersections(ray))
             .collect();
         xs.sort_unstable_by(|l, r| l.distance.partial_cmp(&r.distance).expect("NaN unexpected"));
         xs
@@ -69,6 +68,7 @@ impl World {
 pub(crate) mod test_util {
     use super::*;
     use crate::light::Material;
+    use crate::shape::Object;
     use crate::transform;
     use crate::tuple::Tuple;
 
@@ -76,18 +76,18 @@ pub(crate) mod test_util {
         World {
             light: PointLight::new(color::WHITE, Tuple::new_point(-10.0, 10.0, -10.0)),
             objects: vec![
-                Sphere {
+                Shape {
                     material: Material {
                         color: Color::new(0.8, 1.0, 0.6),
                         diffuse: 0.7,
                         specular: 0.2,
                         ..Material::default()
                     },
-                    ..Sphere::default()
+                    ..Shape::new(Object::Sphere)
                 },
-                Sphere {
+                Shape {
                     transform: transform::scaling(0.5, 0.5, 0.5),
-                    ..Sphere::default()
+                    ..Shape::new(Object::Sphere)
                 },
             ],
         }
@@ -99,6 +99,7 @@ mod tests {
     use super::*;
 
     use super::test_util;
+    use crate::shape::Object;
     use crate::transform;
     use crate::tuple::Tuple;
 
@@ -113,19 +114,19 @@ mod tests {
             w.intersects(&r),
             [
                 Intersection {
-                    sphere: &w.objects[0],
+                    shape: &w.objects[0],
                     distance: 4.0
                 },
                 Intersection {
-                    sphere: &w.objects[1],
+                    shape: &w.objects[1],
                     distance: 4.5
                 },
                 Intersection {
-                    sphere: &w.objects[1],
+                    shape: &w.objects[1],
                     distance: 5.5
                 },
                 Intersection {
-                    sphere: &w.objects[0],
+                    shape: &w.objects[0],
                     distance: 6.0
                 },
             ]
@@ -142,7 +143,7 @@ mod tests {
         let shape = &w.objects[0];
         let i = Intersection {
             distance: 4.0,
-            sphere: shape,
+            shape,
         };
         assert_eq!(
             w.shade_hit(&i.prepare_computations(&r)),
@@ -161,7 +162,7 @@ mod tests {
         let shape = &w.objects[1];
         let i = Intersection {
             distance: 0.5,
-            sphere: shape,
+            shape,
         };
         assert_eq!(
             w.shade_hit(&i.prepare_computations(&r)),
@@ -174,10 +175,10 @@ mod tests {
         let w = World {
             light: PointLight::new(color::WHITE, Tuple::new_point(0.0, 0.0, -10.0)),
             objects: vec![
-                Sphere::default(),
-                Sphere {
+                Shape::new(Object::Sphere),
+                Shape {
                     transform: transform::translation(0.0, 0.0, 10.0),
-                    ..Sphere::default()
+                    ..Shape::new(Object::Sphere)
                 },
             ],
         };
@@ -189,7 +190,7 @@ mod tests {
 
         let i = Intersection {
             distance: 4.0,
-            sphere: &w.objects[1],
+            shape: &w.objects[1],
         };
 
         assert_eq!(

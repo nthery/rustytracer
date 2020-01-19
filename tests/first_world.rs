@@ -6,14 +6,15 @@ use std::fs::File;
 use rustytracer::camera::Camera;
 use rustytracer::color::{self, Color};
 use rustytracer::light::{Material, PointLight};
-use rustytracer::sphere::Sphere;
+use rustytracer::shape::{Object, Shape};
 use rustytracer::transform;
 use rustytracer::tuple::Tuple;
 use rustytracer::world::World;
 
 #[test]
 fn first_world() {
-    let floor = Sphere::with_transform_and_material(
+    let floor = Shape::with_transform_and_material(
+        Object::Sphere,
         transform::scaling(10.0, 0.01, 10.0),
         Material {
             color: Color::new(1.0, 0.9, 0.9),
@@ -22,21 +23,24 @@ fn first_world() {
         },
     );
 
-    let left_wall = Sphere::with_transform_and_material(
+    let left_wall = Shape::with_transform_and_material(
+        Object::Sphere,
         &(&(&transform::translation(0.0, 0.0, 5.0) * &transform::rotation_y(-PI / 4.0))
             * &transform::rotation_x(PI / 2.0))
             * &transform::scaling(10.0, 0.01, 10.0),
         floor.material.clone(),
     );
 
-    let right_wall = Sphere::with_transform_and_material(
+    let right_wall = Shape::with_transform_and_material(
+        Object::Sphere,
         &(&(&transform::translation(0.0, 0.0, 5.0) * &transform::rotation_y(PI / 4.0))
             * &transform::rotation_x(PI / 2.0))
             * &transform::scaling(10.0, 0.01, 10.0),
         floor.material.clone(),
     );
 
-    let middle = Sphere::with_transform_and_material(
+    let middle = Shape::with_transform_and_material(
+        Object::Sphere,
         transform::translation(-0.5, 1.0, 0.5),
         Material {
             color: Color::new(0.1, 1.0, 0.5),
@@ -46,7 +50,8 @@ fn first_world() {
         },
     );
 
-    let right = Sphere::with_transform_and_material(
+    let right = Shape::with_transform_and_material(
+        Object::Sphere,
         &transform::translation(1.5, 0.5, -0.5) * &transform::scaling(0.5, 0.5, 0.5),
         Material {
             color: Color::new(0.5, 1.0, 0.1),
@@ -56,7 +61,8 @@ fn first_world() {
         },
     );
 
-    let left = Sphere::with_transform_and_material(
+    let left = Shape::with_transform_and_material(
+        Object::Sphere,
         &transform::translation(-1.5, 0.33, -0.75) * &transform::scaling(0.33, 0.33, 0.33),
         Material {
             color: Color::new(1.0, 0.8, 0.1),
