@@ -82,6 +82,7 @@ impl Shape {
 #[derive(PartialEq, Debug)]
 pub enum Object {
     Sphere,
+    Plane,
 }
 
 impl Object {
@@ -111,6 +112,16 @@ impl Object {
                     ]
                 }
             }
+            Self::Plane => {
+                if util::nearly_equal(trans_ray.direction().y(), 0.0) {
+                    Vec::new()
+                } else {
+                    vec![Intersection {
+                        distance: -trans_ray.origin().y() / trans_ray.direction().y(),
+                        shape,
+                    }]
+                }
+            }
         }
     }
 
@@ -119,6 +130,7 @@ impl Object {
         debug_assert!(pt.is_point());
         match self {
             Object::Sphere => pt - &ORIGIN,
+            Object::Plane => Tuple::new_vector(0.0, 1.0, 0.0),
         }
     }
 }
@@ -547,5 +559,54 @@ mod tests {
         let comps = i.prepare_computations(&r);
         assert!(comps.over_point.z() < -util::EPSILON / 2.0);
         assert!(comps.point.z() > comps.over_point.z());
+    }
+
+    #[test]
+    fn normal_of_plane_is_constant_everywhere() {
+        let p = Object::Plane;
+        assert_eq!(p.normal_at(&ORIGIN), Tuple::new_vector(0.0, 1.0, 0.0));
+        assert_eq!(
+            p.normal_at(&Tuple::new_point(10.0, 0.0, 10.0)),
+            Tuple::new_vector(0.0, 1.0, 0.0)
+        );
+    }
+    #[test]
+    fn intersects_with_ray_parallel_to_plane() {
+        let p = Shape::new(Object::Plane);
+        let r = Ray::from_triplets((0.0, 10.0, 0.0), (0.0, 0.0, 1.0));
+        assert!(p.object.intersections(&p, r).is_empty());
+    }
+
+    #[test]
+    fn intersects_with_coplanar_ray() {
+        let p = Shape::new(Object::Plane);
+        let r = Ray::from_triplets((0.0, 0.0, 0.0), (0.0, 0.0, 1.0));
+        assert!(p.object.intersections(&p, r).is_empty());
+    }
+
+    #[test]
+    fn ray_intersecting_plane_from_above() {
+        let p = Shape::new(Object::Plane);
+        let r = Ray::from_triplets((0.0, 1.0, 0.0), (0.0, -1.0, 0.0));
+        assert_eq!(
+            p.object.intersections(&p, r),
+            vec![Intersection {
+                distance: 1.0,
+                shape: &p
+            }]
+        );
+    }
+
+    #[test]
+    fn ray_intersecting_plane_from_below() {
+        let p = Shape::new(Object::Plane);
+        let r = Ray::from_triplets((0.0, -1.0, 0.0), (0.0, 1.0, 0.0));
+        assert_eq!(
+            p.object.intersections(&p, r),
+            vec![Intersection {
+                distance: 1.0,
+                shape: &p
+            }]
+        );
     }
 }
