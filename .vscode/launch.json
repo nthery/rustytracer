@@ -1,0 +1,103 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'rustytracer'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=rustytracer"
+                ],
+                "filter": {
+                    "name": "rustytracer",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'sphere_shadow'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=sphere_shadow",
+                    "--package=rustytracer"
+                ],
+                "filter": {
+                    "name": "sphere_shadow",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'illuminated_sphere'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=illuminated_sphere",
+                    "--package=rustytracer"
+                ],
+                "filter": {
+                    "name": "illuminated_sphere",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'first_world'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=first_world",
+                    "--package=rustytracer"
+                ],
+                "filter": {
+                    "name": "first_world",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'canvas_to_ppm'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=canvas_to_ppm",
+                    "--package=rustytracer"
+                ],
+                "filter": {
+                    "name": "canvas_to_ppm",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
