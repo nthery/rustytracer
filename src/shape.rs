@@ -58,7 +58,7 @@ impl Shape {
 
         let it = self.transform.inverted();
         let obj_pt = &it * world_pt;
-        let obj_normal = &obj_pt - &ORIGIN;
+        let obj_normal = self.object.normal_at(&obj_pt);
         let mut world_normal = &it.transposed() * &obj_normal;
         world_normal.set(3, 0.0);
         world_normal.normalized()
@@ -111,6 +111,14 @@ impl Object {
                     ]
                 }
             }
+        }
+    }
+
+    /// See Shape::normal_at()
+    fn normal_at(&self, pt: &Tuple) -> Tuple {
+        debug_assert!(pt.is_point());
+        match self {
+            Object::Sphere => pt - &ORIGIN,
         }
     }
 }
