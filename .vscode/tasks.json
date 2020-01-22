@@ -15,6 +15,15 @@
             }
         },
         {
+            "label": "Check current integration test",
+            "type": "shell",
+            "command": "cargo check --test ${fileBasenameNoExtension}",
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "group": "build",
+        },
+        {
             "type": "cargo",
             "subcommand": "test",
             "problemMatcher": [
